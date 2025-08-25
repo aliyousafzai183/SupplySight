@@ -1,0 +1,95 @@
+import { readFileSync } from 'fs';
+import { join } from 'path';
+import { fileURLToPath } from 'url';
+import { logger } from '../logger.js';
+
+const __dirname = fileURLToPath(new URL('.', import.meta.url));
+const seedData = JSON.parse(
+  readFileSync(join(__dirname, '../data/seed.json'), 'utf-8')
+);
+
+export type Product = {
+  id: string;
+  name: string;
+  sku: string;
+  warehouse: string;
+  stock: number;
+  demand: number;
+};
+
+export type Status = 'HEALTHY' | 'LOW' | 'CRITICAL';
+
+export const getStatus = (stock: number, demand: number): Status => {
+  if (stock > demand) return 'HEALTHY';
+  if (stock === demand) return 'LOW';
+  return 'CRITICAL';
+};
+
+export const productsResolver = {
+  products: async (
+    _: any,
+    {
+      search,
+      warehouse,
+      status,
+      page = 1,
+      pageSize = 10
+    }: {
+      search?: string;
+      warehouse?: string;
+      status?: Status;
+      page?: number;
+      pageSize?: number;
+    }
+  ) => {
+    logger.info('Querying products', { search, warehouse, status, page, pageSize });
+
+    let filteredProducts = [...seedData];
+
+    // Apply search filter
+    if (search) {
+      const searchLower = search.toLowerCase();
+      filteredProducts = filteredProducts.filter(
+        (product) =>
+          product.name.toLowerCase().includes(searchLower) ||
+          product.sku.toLowerCase().includes(searchLower) ||
+          product.id.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Apply warehouse filter
+    if (warehouse) {
+      filteredProducts = filteredProducts.filter(
+        (product) => product.warehouse === warehouse
+      );
+    }
+
+    // Apply status filter
+    if (status) {
+      filteredProducts = filteredProducts.filter(
+        (product) => getStatus(product.stock, product.demand) === status
+      );
+    }
+
+    // Apply pagination
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
+
+    logger.info('Products query result', {
+      total: filteredProducts.length,
+      returned: paginatedProducts.length,
+      page,
+      pageSize
+    });
+
+    return paginatedProducts;
+  },
+
+  warehouses: async () => {
+    logger.info('Querying warehouses');
+    const warehouses = [...new Set(seedData.map((product) => product.warehouse))];
+    logger.info('Warehouses query result', { count: warehouses.length });
+    return warehouses;
+  }
+};

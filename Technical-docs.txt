@@ -1,0 +1,557 @@
+SupplySight React App — Technical Docs
+
+React + TypeScript + Tailwind on Node 22+ with a mock GraphQL API, tests, CI/CD to Vercel (Dev & Prod), logging/observability, and production-grade patterns. Requirements anchored to the take‑home brief.
+
+1) Overview
+
+Goal. Build the SupplySight Daily Inventory Dashboard as a production‑ready mini product: clean architecture, correct business logic, excellent DX/CI, and real‑world quality gates.
+
+Top highlights
+
+React 18 + Vite + TypeScript + Tailwind (meets “React + Tailwind project” requirement).
+
+Mock GraphQL API (Node 22+ with GraphQL Yoga) seeded from provided sample data.
+
+Apollo Client (normalized cache, optimistic updates)
+
+TanStack Router for routes & URL‑driven filters
+
+Vitest + React Testing Library (unit), Playwright (e2e), MSW (network mocks)
+
+GitHub Actions CI (typecheck, lint, unit, e2e on Preview) + Vercel CD (Dev & Prod)
+
+Observability: Pino (API), Sentry (web), Web Vitals
+
+Security & ergonomics: Zod‑validated env, rate limiting, strict ESLint, Husky hooks
+
+NOTES.md (decisions, tradeoffs, future work—explicitly requested).
+
+2) Architecture Diagram
+                 ┌───────────────────────────────┐
+                 │ GitHub                         │
+                 │  PRs → CI (lint/test/e2e)     │
+                 └──────────────┬────────────────┘
+                                │
+                  On merge/tag  │  Vercel Deploy via token
+                                ▼
+                       ┌─────────────────┐
+                       │  Vercel Dev     │  ← branch: develop
+                       └─────────────────┘
+                                │
+                                ▼
+                       ┌─────────────────┐
+                       │  Vercel Prod    │  ← branch: main
+                       └─────────────────┘
+
+ Frontend (Vite React) ─────────────► calls ─────────────► Mock GraphQL (Yoga)
+        ▲  Apollo Client (cache)                          ▲ Pino logs
+        │  MSW in tests                                   │ Rate limit
+        │                                                 │ Seed data
+        └───────────── Sentry + Web Vitals ───────────────┘
+
+3) Folder Structure
+supply-sight/
+  apps/
+    web/                       # React (Vite) app
+      public/
+      src/
+        app/
+          routes/              # Routed pages & layout
+            index.tsx
+          components/          # Reusable UI
+            KPICard.tsx
+            LineChart.tsx
+            Filters.tsx
+            ProductsTable.tsx
+            StatusPill.tsx
+            Drawer.tsx
+            Loading.tsx
+            Empty.tsx
+          features/
+            products/
+              queries.ts        # GraphQL queries
+              mutations.ts      # GraphQL mutations
+              types.ts          # GQL/Domain types
+              adapters.ts       # UI ↔ domain mappers
+              hooks.ts          # data fetching hooks
+              __tests__/        # feature tests
+          lib/
+            apollo.ts           # Apollo client setup
+            env.ts              # zod env validation
+            status.ts           # Healthy/Low/Critical logic
+            pagination.ts
+            format.ts
+          styles/
+            globals.css
+        main.tsx
+        vite-env.d.ts
+      index.html
+      tailwind.config.ts
+      postcss.config.js
+      tsconfig.json
+      vite.config.ts
+      .eslintrc.cjs
+      .prettierrc
+    server/                    # Node 22+ mock GraphQL API
+      src/
+        schema.ts              # typedefs
+        resolvers/
+          kpis.ts
+          products.ts
+          mutations.ts
+        data/
+          seed.json
+        logger.ts              # pino logger
+        rateLimit.ts
+        index.ts               # server entry
+      package.json
+  .github/
+    workflows/
+      ci.yml
+      e2e.yml
+  package.json                 # workspace root
+  npm-workspace.yaml
+  README.md
+  NOTES.md
+
+
+Why this structure?
+
+apps/web and apps/server keep UI and API concerns separate (the brief asks for both a React app and a mock GraphQL server).
+
+features/* organizes code by domain (products/kpis), keeping UI/data/logic co‑located.
+
+lib/* holds cross‑cutting utilities.
+
+4) Tech Choices & Rationale
+
+Vite + React 18 + TS: minimal config, fast dev server, type safety (great for a focused take‑home).
+
+Tailwind: fast, consistent styles; accessible focus/hover out of the box; matches requirement.
+
+TanStack Router: URL as source of truth for filters (search, warehouse, status, page)—aligns with “filters update results live.”
+
+Apollo Client: normalized cache; optimistic updates for snappy mutation UX (“Update Demand”, “Transfer Stock”).
+
+GraphQL Yoga: light, modern GraphQL server; easy to extend from given schema & sample data.
+
+Recharts: responsive KPI line graph (Stock vs Demand).
+
+Zod: runtime env validation and form schemas (safer forms).
+
+Vitest/RTL/Playwright/MSW: pragmatic testing stack that mirrors production behavior.
+
+Pino: fast structured logs in API.
+
+Sentry: error tracking; Web Vitals for performance observability.
+
+5) Business Logic (Domain)
+
+KPI cards
+
+Total Stock: sum(stock)
+
+Total Demand: sum(demand)
+
+Fill Rate: sum(min(stock, demand)) / sum(demand)
+Matches the spec.
+
+Status rules per product
+
+Healthy: stock > demand
+
+Low: stock === demand
+
+Critical: stock < demand (row tinted)
+Exactly as requested.
+
+Filters
+
+Search by name | sku | id
+
+Warehouse dropdown (from API)
+
+Status dropdown (All/Healthy/Low/Critical)
+Mirrors the brief.
+
+Pagination: 10 rows/page with ?page= in URL.
+
+Interactions
+
+Filters apply live
+
+Row → Drawer with Product details, Update Demand + Transfer Stock forms (mutations)
+Required in spec.
+
+6) Data Layer
+GraphQL schema (excerpt)
+# schema.ts
+
+type Product {
+  id: ID!
+  name: String!
+  sku: String!
+  warehouse: String!
+  stock: Int!
+  demand: Int!
+}
+
+enum Status { HEALTHY LOW CRITICAL }
+
+type KPI {
+  date: String!
+  stock: Int!
+  demand: Int!
+}
+
+type Query {
+  products(
+    search: String
+    warehouse: String
+    status: Status
+    page: Int = 1
+    pageSize: Int = 10
+  ): [Product!]!
+  warehouses: [String!]!
+  kpis(range: Int!): [KPI!]!
+}
+
+type Mutation {
+  updateDemand(id: ID!, demand: Int!): Product!
+  transferStock(id: ID!, qty: Int!, from: String!, to: String!): Product!
+}
+
+Resolvers (behavior)
+
+products: filters + pagination; status derived per product (Healthy/Low/Critical).
+
+warehouses: set of unique warehouses (for dropdown).
+
+kpis(range): synthesize N daily points from seed totals (trend line).
+
+updateDemand: set new demand; validate >= 0; log mutation.
+
+transferStock: decrease from one warehouse and increase another (simplified seed supports single‑warehouse—future‑proof logic).
+
+Client queries
+
+GET_PRODUCTS (variables match filters)
+
+GET_KPIS(range) for line chart
+
+Mutations: UPDATE_DEMAND, TRANSFER_STOCK
+
+7) UI/UX Details
+
+Top bar with logo text SupplySight + date range chips (7d/14d/30d).
+
+KPI cards with animated count‑up and skeletons.
+
+Line chart responsive with tooltip & legend (Stock vs Demand).
+
+Filters row sticky; debounce search input; warehouse/status selects.
+
+Table columns as specified; empty, loading, and error states; status pills with aria‑labels; Critical row tinted.
+
+Drawer: product details; Update Demand & Transfer Stock forms; keyboard accessible (focus trap; ESC).
+
+A11y: semantic headings, roles, focus outlines, color contrast.
+
+Theming: light/dark via Tailwind class strategy.
+
+8) Environment & Configuration
+
+Env validation (lib/env.ts)
+
+import { z } from 'zod';
+
+const Env = z.object({
+  VITE_GRAPHQL_URL: z.string().url(),
+  VITE_SENTRY_DSN: z.string().optional(),
+});
+
+export const env = Env.parse({
+  VITE_GRAPHQL_URL: import.meta.env.VITE_GRAPHQL_URL,
+  VITE_SENTRY_DSN: import.meta.env.VITE_SENTRY_DSN,
+});
+
+
+Vercel Projects
+
+Dev envs: VITE_GRAPHQL_URL, VITE_SENTRY_DSN
+
+Prod envs: same, with prod values
+
+Vite Proxy (local)
+
+// vite.config.ts
+server: { proxy: { '/graphql': 'http://localhost:4000' } }
+
+9) Logging & Observability
+
+API (Node)
+
+Pino logger with request‑id per request.
+
+Logs: level, method, operationName, duration, result size, errors.
+
+Web
+
+Sentry init (low sample rates).
+
+Report Web Vitals (LCP, INP, CLS) to Sentry or console in Dev.
+
+10) Security Hardening (right‑sized)
+
+Input validation (Zod on forms, safe integers)
+
+CORS locked to Vercel domains
+
+Helmet‑like headers on API; CSP for web if time permits
+
+Read‑only GraphQL introspection in Prod (optional)
+
+11) Performance Practices
+
+Route‑level code splitting
+
+Memoized table rows & selectors
+
+Virtualization toggle if data grows (TanStack Table + React Virtual)
+
+Preload hero fonts/icons; defer non‑critical scripts
+
+12) Testing Strategy
+
+Unit (Vitest + RTL)
+
+Components: KPICard, StatusPill, Filters
+
+Utils: status rules, KPI math, pagination
+
+Integration
+
+ProductsTable with Apollo/MSW (loading → data → error)
+
+Drawer flows: update demand (optimistic update + rollback)
+
+E2E (Playwright)
+
+Load dashboard → see KPIs → filter by status → open drawer → submit mutation
+
+Pagination behavior and URL sync (back/forward navigation)
+
+Coverage gates
+
+Target 80%+ lines on features/* and lib/*
+
+13) GitHub Actions (CI) & Vercel (CD)
+
+.github/workflows/ci.yml
+
+name: CI
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main, develop]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: npm/action-setup@v4
+        with: { version: 9 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: 'npm' }
+      - run: npm install --frozen-lockfile
+      - run: npm -C apps/web typecheck
+      - run: npm -C apps/web lint
+      - run: npm -C apps/web test:unit -- --reporter=default
+      - run: npm -C apps/web build
+
+
+.github/workflows/e2e.yml (PR E2E on Vercel Preview)
+
+name: E2E
+on: [pull_request]
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: amondnet/vercel-action@v25
+        id: vercel
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_DEV }}
+          working-directory: apps/web
+          github-comment: false
+      - name: Run Playwright
+        uses: microsoft/playwright-github-action@v1
+      - run: npm -C apps/web test:e2e -- --project=chromium --grep @smoke
+        env:
+          BASE_URL: ${{ steps.vercel.outputs.preview-url }}
+
+
+Branch → Environment
+
+develop → Vercel Dev project (VERCEL_PROJECT_ID_DEV)
+
+main → Vercel Prod project (VERCEL_PROJECT_ID_PROD)
+
+14) Scripts (npm)
+
+Root package.json (excerpt)
+
+{
+  "private": true,
+  "workspaces": ["apps/*"],
+  "scripts": {
+    "dev": "npm -C apps/server dev & npm -C apps/web dev",
+    "build": "npm -C apps/server build && npm -C apps/web build",
+    "start": "npm -C apps/server start & npm -C apps/web preview"
+  }
+}
+
+
+apps/web/package.json (excerpt)
+
+{
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview --port 5173",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test:unit": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test"
+  }
+}
+
+
+apps/server/package.json (excerpt)
+
+{
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc -p .",
+    "start": "node dist/index.js"
+  }
+}
+
+15) Code Samples
+
+Status util (lib/status.ts)
+
+export type Status = 'HEALTHY' | 'LOW' | 'CRITICAL';
+export const getStatus = (stock: number, demand: number): Status =>
+  stock > demand ? 'HEALTHY' : stock === demand ? 'LOW' : 'CRITICAL';
+
+
+Optimistic Update (updateDemand)
+
+const [updateDemand] = useMutation(UPDATE_DEMAND);
+const onSubmit = async (id: string, demand: number) => {
+  await updateDemand({
+    variables: { id, demand },
+    optimisticResponse: {
+      updateDemand: { __typename: 'Product', id, demand, stock: currentStock }
+    }
+  });
+};
+
+
+Pino logger (API)
+
+import pino from 'pino';
+export const logger = pino({ level: process.env.NODE_ENV === 'production' ? 'info' : 'debug' });
+
+16) Developer Experience
+
+Husky pre‑commit: lint-staged runs ESLint + Prettier on changed files
+
+Editorconfig and VS Code settings checked in
+
+Absolute imports via tsconfig.paths
+
+17) NOTES.md (what reviewers want to see)
+
+Include:
+
+Architecture & tradeoffs (SPA vs SSR, Apollo vs urql)
+
+Business logic choices (status rules, pagination)
+
+Data boundaries (what’s mocked, what’s derived)
+
+Testing scope & what you’d add with more time (accessibility tests, virtualization)
+
+Future work: real auth/RBAC, multi‑warehouse, proper event‑sourced KPIs
+These align with the requested deliverable expectations.
+
+18) How to Run Locally
+npm install
+npm dev
+# web on http://localhost:5173, API on http://localhost:4000/graphql
+
+
+Set .env in apps/web:
+
+VITE_GRAPHQL_URL=http://localhost:4000/graphql
+VITE_SENTRY_DSN=
+
+19) Deployment Notes (Vercel)
+
+Create two Vercel projects: supply-sight-dev and supply-sight-prod
+
+Set env vars per project
+
+Link Dev project to develop branch; Prod to main
+
+Add VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID_DEV, VERCEL_PROJECT_ID_PROD secrets in GitHub
+
+20) Roadmap (Optional Enhancements)
+
+Column sorting and multi‑select filters
+
+CSV export of table
+
+TanStack Table + virtualization for 1k+ rows
+
+Dark mode fine‑tuning and theme tokens
+
+i18n scaffolding (FormatJS)
+
+Lighthouse CI budget in PRs
+
+21) Checklists
+
+Definition of Done
+
+ All acceptance criteria implemented
+
+ Typecheck/lint passing
+
+ Unit + e2e green
+
+ Loading/empty/error states verified
+
+ A11y: keyboard nav, focus, contrast
+
+ NOTES.md updated with decisions
+
+Release
+
+ Tag created (e.g., v0.1.0)
+
+ Changelog entry added
+
+ Vercel deploy verified (Dev, then Prod)
