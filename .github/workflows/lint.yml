@@ -3,21 +3,39 @@ name: Lint
 on:
   pull_request:
     branches: [ main ]
-    paths:
-      - 'apps/web/**/*.{js,jsx,ts,tsx}'
-      - 'apps/web/.eslintrc.*'
-      - 'apps/web/eslint.config.*'
-      - '.github/workflows/lint.yml'
 
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Check for relevant changes
+        id: check-changes
+        run: |
+          if git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | grep -E 'apps/web/.*\.(js|jsx|ts|tsx)$|apps/web/\.eslintrc\.|apps/web/eslint\.config\.|\.github/workflows/lint\.yml$'; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Skip if no relevant changes
+        if: steps.check-changes.outputs.has_changes == 'false'
+        run: |
+          echo "No relevant files changed, skipping lint check"
+          exit 0
+      
       - uses: actions/setup-node@v4
+        if: steps.check-changes.outputs.has_changes == 'true'
         with:
           node-version: 20
           cache: 'npm'
+      
       - run: npm ci
+        if: steps.check-changes.outputs.has_changes == 'true'
+      
       - name: ESLint
+        if: steps.check-changes.outputs.has_changes == 'true'
         run: npm run lint
