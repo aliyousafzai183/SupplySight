@@ -14,8 +14,6 @@ A production-ready Daily Inventory Dashboard built with React, TypeScript, and G
 
 ## 📸 Screenshots
 
-> **Note**: Screenshots are placeholders. Please add actual screenshots of your running application to the `docs/screenshots/` directory. See `docs/screenshots/README.md` for detailed instructions.
-
 ### Main Dashboard
 ![SupplySight Dashboard](docs/screenshots/dashboard-main.png)
 *Main dashboard view with KPI cards, filters, and product table*
@@ -31,6 +29,10 @@ A production-ready Daily Inventory Dashboard built with React, TypeScript, and G
 ### Filtered Results
 ![Filtered Results](docs/screenshots/filtered-results.png)
 *Dashboard with active filters showing critical stock items*
+
+### GitHub PR Checks
+![Required Checks](docs/screenshots/required-checks.png)
+*GitHub Actions CI/CD checks that must pass before merging to main branch*
 
 ## 📊 Dashboard Features
 
@@ -85,7 +87,7 @@ A production-ready Daily Inventory Dashboard built with React, TypeScript, and G
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/aliyousafzai183/SupplySight.git
    cd SupplySight
    ```
 
@@ -213,24 +215,6 @@ The application comes with 25 sample product entries across multiple warehouses:
 
 Each product includes realistic stock and demand values to demonstrate the status calculation logic.
 
-## 🎯 Business Logic
-
-### Status Calculation
-```typescript
-const getStatus = (stock: number, demand: number): Status => {
-  if (stock > demand) return 'HEALTHY';
-  if (stock === demand) return 'LOW';
-  return 'CRITICAL';
-};
-```
-
-### Fill Rate Calculation
-```typescript
-const fillRate = totalDemand > 0 
-  ? products.reduce((sum, p) => sum + Math.min(p.stock, p.demand), 0) / totalDemand
-  : 1;
-```
-
 ## 🔒 Security & Performance
 
 - **Input Validation** - Zod schemas for form validation
@@ -248,6 +232,8 @@ const fillRate = totalDemand > 0
 - **`test.yml`** - Unit test execution
 - **`build.yml`** - Production build verification
 - **`delete-branch.yml`** - Automatic branch cleanup after merge
+
+**All checks must pass before merging to main branch** - See screenshot above for the required checks interface.
 
 ### Vercel Deployment
 The application is designed for deployment on Vercel with:
@@ -317,4 +303,4 @@ MIT License - see LICENSE file for details.
 
 ---
 
-Built with ❤️ using modern web technologies
+Built with ❤️ using modern web technologies by Ali Said
