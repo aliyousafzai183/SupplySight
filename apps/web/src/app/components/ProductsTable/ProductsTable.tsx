@@ -1,8 +1,7 @@
-
-import type { Product, ProductConnection } from '../features/products/types.js';
-import { StatusPill } from './StatusPill.js';
-import { getStatus } from '../lib';
-import { Pagination } from './Pagination.js';
+import type { Product, ProductConnection } from '../../features/products/types';
+import { StatusPill } from '../StatusPill/index.js';
+import { getStatus } from '../../lib';
+import { Pagination } from '../Pagination/index.js';
 
 interface ProductsTableProps {
   data: ProductConnection;

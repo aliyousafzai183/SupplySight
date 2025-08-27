@@ -1,5 +1,4 @@
-
-import type { Status } from '../features/products/types.js';
+import type { Status } from '../../features/products/types';
 
 interface StatusPillProps {
   status: Status;

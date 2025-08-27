@@ -1,12 +1,12 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useQuery } from '@apollo/client';
-import { GET_PRODUCTS, GET_WAREHOUSES, GET_KPIS } from '../features/products/queries.js';
-import { KPICard } from '../components/KPICard.js';
-import { LineChart } from '../components/LineChart.js';
-import { Filters } from '../components/Filters.js';
-import { ProductsTable } from '../components/ProductsTable.js';
-import { Drawer } from '../components/Drawer.js';
-import type { Product, ProductsFilters } from '../features/products/types.js';
+import { GET_PRODUCTS, GET_WAREHOUSES, GET_KPIS } from '../../features/products/queries/index.js';
+import { KPICard } from '../../components/KPICard/index.js';
+import { LineChart } from '../../components/LineChart/index.js';
+import { Filters } from '../../components/Filters/index.js';
+import { ProductsTable } from '../../components/ProductsTable/index.js';
+import { Drawer } from '../../components/Drawer/index.js';
+import type { Product, ProductsFilters } from '../../features/products/types/index.js';
 
 export function Dashboard() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);

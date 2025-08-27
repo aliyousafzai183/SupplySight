@@ -1,14 +1,13 @@
 import { useState, useEffect } from "react";
 import { useMutation, useQuery } from "@apollo/client";
-import toast from "react-hot-toast";
 import {
   UPDATE_DEMAND,
   TRANSFER_STOCK,
-} from "../features/products/mutations.js";
-import { GET_WAREHOUSES, GET_PRODUCTS } from "../features/products/queries.js";
-import type { Product } from "../features/products/types.js";
-import { StatusPill } from "./StatusPill.js";
-import { getStatus, client } from "../lib";
+} from "../../features/products/mutations";
+import { GET_WAREHOUSES, GET_PRODUCTS } from "../../features/products/queries";
+import type { Product } from "../../features/products/types";
+import { StatusPill } from "../StatusPill";
+import { getStatus, client } from "../../lib";
 
 interface DrawerProps {
   product: Product;
@@ -17,6 +16,11 @@ interface DrawerProps {
 }
 
 export function Drawer({ product, onClose, onUpdate }: DrawerProps) {
+  // Handle null product case
+  if (!product) {
+    return null;
+  }
+
   const [demand, setDemand] = useState(product.demand.toString());
   const [transferAmount, setTransferAmount] = useState("");
   const [targetWarehouse, setTargetWarehouse] = useState("");
@@ -60,12 +64,10 @@ export function Drawer({ product, onClose, onUpdate }: DrawerProps) {
         refetchQueries: [GET_PRODUCTS],
         awaitRefetchQueries: true,
       });
-      toast.success(`Successfully updated demand to ${demand}`);
       client.resetStore();
       onUpdate?.();
     } catch (error) {
       console.error("Failed to update demand:", error);
-      toast.error("Failed to update demand. Please try again.");
     } finally {
       setIsUpdating(false);
     }
@@ -77,9 +79,6 @@ export function Drawer({ product, onClose, onUpdate }: DrawerProps) {
 
     const amount = parseInt(transferAmount);
     if (amount > product.stock) {
-      toast.error(
-        `Cannot transfer more than available stock (${product.stock})`
-      );
       return;
     }
 
@@ -96,9 +95,6 @@ export function Drawer({ product, onClose, onUpdate }: DrawerProps) {
         refetchQueries: [GET_PRODUCTS],
         awaitRefetchQueries: true,
       });
-      toast.success(
-        `Successfully transferred ${amount} units from ${product.warehouse} to ${targetWarehouse}!`
-      );
       setTransferAmount("");
       setTargetWarehouse("");
 
@@ -109,14 +105,13 @@ export function Drawer({ product, onClose, onUpdate }: DrawerProps) {
       }, 100);
     } catch (error) {
       console.error("Failed to transfer stock:", error);
-      toast.error("Failed to transfer stock. Please try again.");
     } finally {
       setIsUpdating(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden">
+    <div className="fixed inset-0 z-50 overflow-hidden" role="dialog" aria-modal="true">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
@@ -195,10 +190,11 @@ export function Drawer({ product, onClose, onUpdate }: DrawerProps) {
               </h4>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="demand-input" className="block text-sm font-medium text-gray-700 mb-1">
                     New demand value (current: {product.demand})
                   </label>
                   <input
+                    id="demand-input"
                     type="number"
                     value={demand}
                     onChange={(e) => setDemand(e.target.value)}
@@ -208,8 +204,9 @@ export function Drawer({ product, onClose, onUpdate }: DrawerProps) {
                   />
                 </div>
                 <button
+                  type="button"
                   onClick={handleUpdateDemand}
-                  disabled={isUpdating || !demand || isNaN(Number(demand))}
+                  disabled={isUpdating || !demand || isNaN(Number(demand)) || Number(demand) < 0}
                   className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isUpdating ? "Updating..." : "Update Demand"}
@@ -224,10 +221,11 @@ export function Drawer({ product, onClose, onUpdate }: DrawerProps) {
               </h4>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="transfer-amount" className="block text-sm font-medium text-gray-700 mb-1">
                     Amount to transfer (max: {product.stock})
                   </label>
                   <input
+                    id="transfer-amount"
                     type="number"
                     value={transferAmount}
                     onChange={(e) => setTransferAmount(e.target.value)}
@@ -239,10 +237,11 @@ export function Drawer({ product, onClose, onUpdate }: DrawerProps) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="target-warehouse" className="block text-sm font-medium text-gray-700 mb-1">
                     Target warehouse
                   </label>
                   <select
+                    id="target-warehouse"
                     value={targetWarehouse}
                     onChange={(e) => setTargetWarehouse(e.target.value)}
                     className="input-field w-full"
@@ -263,12 +262,14 @@ export function Drawer({ product, onClose, onUpdate }: DrawerProps) {
                 </div>
 
                 <button
+                  type="button"
                   onClick={handleTransferStock}
                   disabled={
                     isUpdating ||
                     !transferAmount ||
                     !targetWarehouse ||
                     isNaN(Number(transferAmount)) ||
+                    Number(transferAmount) <= 0 ||
                     parseInt(transferAmount) > product.stock
                   }
                   className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"

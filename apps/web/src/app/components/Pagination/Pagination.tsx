@@ -15,7 +15,7 @@ export function Pagination({
   onPageChange,
   className = ''
 }: PaginationProps) {
-  if (totalPages <= 1) {
+  if (totalPages <= 0) {
     return null;
   }
 
@@ -55,19 +55,20 @@ export function Pagination({
   };
 
   return (
-    <div className={`flex items-center justify-between ${className}`}>
+    <nav className={`flex items-center justify-between ${className}`} role="navigation">
       <div className="text-sm text-gray-700">
         Page {currentPage} of {totalPages}
       </div>
       
       <div className="flex items-center space-x-2">
-        <button
-          onClick={() => onPageChange(currentPage - 1)}
-          disabled={!hasPreviousPage}
-          className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Previous
-        </button>
+        {hasPreviousPage && (
+          <button
+            onClick={() => onPageChange(currentPage - 1)}
+            className="btn-secondary"
+          >
+            Previous
+          </button>
+        )}
         
         <div className="flex items-center space-x-1">
           {getPageNumbers().map((page, index) => (
@@ -88,14 +89,15 @@ export function Pagination({
           ))}
         </div>
         
-        <button
-          onClick={() => onPageChange(currentPage + 1)}
-          disabled={!hasNextPage}
-          className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Next
-        </button>
+        {hasNextPage && (
+          <button
+            onClick={() => onPageChange(currentPage + 1)}
+            className="btn-secondary"
+          >
+            Next
+          </button>
+        )}
       </div>
-    </div>
+    </nav>
   );
 }
