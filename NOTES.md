@@ -6,7 +6,7 @@
 **Decision**: Used npm workspaces with `apps/web` and `apps/server` separation
 **Rationale**: 
 - Keeps UI and API concerns separate while sharing tooling
-- Enables independent deployment of frontend and backend
+- Keeps UI and API concerns separate while sharing tooling
 - Matches the assignment requirement for both React app and GraphQL server
 - Easier dependency management and versioning
 
@@ -342,22 +342,7 @@ components/
 4. **Accessibility**: Basic ARIA support, could be improved
 5. **Performance**: No virtualization for large datasets
 
-## Deployment Strategy
 
-### Development
-- Local development with hot reloading
-- GraphQL Playground for API testing
-- Environment-specific configurations
-
-### Staging
-- Vercel preview deployments
-- Automated testing on PRs
-- Environment variable management
-
-### Production
-- Vercel production deployment
-- CDN for static assets
-- Monitoring and error tracking
 
 ## Lessons Learned
 
@@ -389,4 +374,4 @@ This project successfully demonstrates modern web development practices with a f
 - Performance optimization through code splitting
 - Enhanced user experience through optimistic updates and URL state management
 
-The application meets all assignment requirements while providing a solid foundation for future enhancements and real-world deployment. The recent improvements have significantly enhanced the user experience and performance of the application.
+The application meets all assignment requirements while providing a solid foundation for future enhancements. The recent improvements have significantly enhanced the user experience and performance of the application.
