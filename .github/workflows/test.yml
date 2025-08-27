@@ -3,26 +3,41 @@ name: Test
 on:
   pull_request:
     branches: [ main ]
-    paths:
-      - 'apps/web/**/*.{js,jsx,ts,tsx}'
-      - 'apps/web/**/*.test.{js,jsx,ts,tsx}'
-      - 'apps/web/vitest.config.*'
-      - 'apps/web/src/test-setup.ts'
-      - 'apps/server/**/*.{js,ts}'
-      - 'apps/server/**/*.test.{js,ts}'
-      - '.github/workflows/test.yml'
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Check for relevant changes
+        id: check-changes
+        run: |
+          if git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | grep -E 'apps/web/.*\.(js|jsx|ts|tsx)$|apps/web/.*\.test\.(js|jsx|ts|tsx)$|apps/web/vitest\.config\.|apps/web/src/test-setup\.ts|apps/server/.*\.(js|ts)$|apps/server/.*\.test\.(js|ts)$|\.github/workflows/test\.yml$'; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Skip if no relevant changes
+        if: steps.check-changes.outputs.has_changes == 'false'
+        run: |
+          echo "No relevant files changed, skipping tests"
+          exit 0
+      
       - uses: actions/setup-node@v4
+        if: steps.check-changes.outputs.has_changes == 'true'
         with:
           node-version: 20
           cache: 'npm'
+      
       - run: npm ci
+        if: steps.check-changes.outputs.has_changes == 'true'
+      
       - name: Run tests
+        if: steps.check-changes.outputs.has_changes == 'true'
         run: npm run test
         env:
           VITE_GRAPHQL_URL: http://localhost:4000/graphql
