@@ -8,8 +8,7 @@ import {
 import { GET_WAREHOUSES, GET_PRODUCTS } from "../features/products/queries.js";
 import type { Product } from "../features/products/types.js";
 import { StatusPill } from "./StatusPill.js";
-import { getStatus } from "../lib/status.js";
-import { client } from "../lib/apollo.js";
+import { getStatus, client } from "../lib";
 
 interface DrawerProps {
   product: Product;

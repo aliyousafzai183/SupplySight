@@ -1,5 +1,5 @@
 
-import { formatNumber, formatPercentage } from '../lib/format.js';
+import { formatNumber, formatPercentage } from '../lib';
 
 interface KPICardProps {
   title: string;

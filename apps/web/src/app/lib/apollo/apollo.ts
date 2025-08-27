@@ -1,6 +1,6 @@
 import { ApolloClient, InMemoryCache, createHttpLink, from } from '@apollo/client';
 import { onError } from '@apollo/client/link/error';
-import { env } from './env.js';
+import { env } from '../env';
 
 const httpLink = createHttpLink({
   uri: env.VITE_GRAPHQL_URL,
