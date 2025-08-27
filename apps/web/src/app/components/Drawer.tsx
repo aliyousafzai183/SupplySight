@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
+import toast from 'react-hot-toast';
 import { UPDATE_DEMAND, TRANSFER_STOCK } from '../features/products/mutations.js';
 import { GET_WAREHOUSES } from '../features/products/queries.js';
 import type { Product } from '../features/products/types.js';
@@ -17,7 +18,10 @@ export function Drawer({ product, onClose, onUpdate }: DrawerProps) {
   const [transferAmount, setTransferAmount] = useState('');
   const [targetWarehouse, setTargetWarehouse] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  
+  useEffect(() => {
+    setDemand(product.demand.toString());
+  }, [product.demand]);
 
   const [updateDemand] = useMutation(UPDATE_DEMAND);
   const [transferStock] = useMutation(TRANSFER_STOCK);
@@ -32,7 +36,6 @@ export function Drawer({ product, onClose, onUpdate }: DrawerProps) {
     if (!demand || isNaN(Number(demand))) return;
     
     setIsUpdating(true);
-    setMessage(null);
     try {
       await updateDemand({
         variables: {
@@ -45,13 +48,24 @@ export function Drawer({ product, onClose, onUpdate }: DrawerProps) {
             ...product,
             demand: parseInt(demand)
           }
+        },
+        update: (cache, { data }) => {
+          if (data?.updateDemand) {
+            // Update the product in the cache
+            cache.modify({
+              id: cache.identify({ __typename: 'Product', id: product.id }),
+              fields: {
+                demand: () => data.updateDemand.demand
+              }
+            });
+          }
         }
       });
-      setMessage({ type: 'success', text: 'Demand updated successfully!' });
+      toast.success(`Successfully updated demand to ${demand}`);
       onUpdate?.();
     } catch (error) {
       console.error('Failed to update demand:', error);
-      setMessage({ type: 'error', text: 'Failed to update demand. Please try again.' });
+      toast.error('Failed to update demand. Please try again.');
     } finally {
       setIsUpdating(false);
     }
@@ -62,12 +76,11 @@ export function Drawer({ product, onClose, onUpdate }: DrawerProps) {
     
     const amount = parseInt(transferAmount);
     if (amount > product.stock) {
-      setMessage({ type: 'error', text: `Cannot transfer more than available stock (${product.stock})` });
+      toast.error(`Cannot transfer more than available stock (${product.stock})`);
       return;
     }
     
     setIsUpdating(true);
-    setMessage(null);
     try {
       await transferStock({
         variables: {
@@ -83,15 +96,27 @@ export function Drawer({ product, onClose, onUpdate }: DrawerProps) {
             warehouse: targetWarehouse,
             stock: product.stock - amount
           }
+        },
+        update: (cache, { data }) => {
+          if (data?.transferStock) {
+            // Update the product in the cache
+            cache.modify({
+              id: cache.identify({ __typename: 'Product', id: product.id }),
+              fields: {
+                warehouse: () => data.transferStock.warehouse,
+                stock: () => data.transferStock.stock
+              }
+            });
+          }
         }
       });
-      setMessage({ type: 'success', text: `Successfully transferred ${amount} units to ${targetWarehouse}!` });
+      toast.success(`Successfully transferred ${amount} units to ${targetWarehouse}!`);
       setTransferAmount('');
       setTargetWarehouse('');
       onUpdate?.();
     } catch (error) {
       console.error('Failed to transfer stock:', error);
-      setMessage({ type: 'error', text: 'Failed to transfer stock. Please try again.' });
+      toast.error('Failed to transfer stock. Please try again.');
     } finally {
       setIsUpdating(false);
     }
@@ -123,22 +148,6 @@ export function Drawer({ product, onClose, onUpdate }: DrawerProps) {
 
           {/* Content */}
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
-            {/* Message Display */}
-            {message && (
-              <div className={`rounded-lg p-4 ${
-                message.type === 'success' 
-                  ? 'bg-green-50 border border-green-200 text-green-800' 
-                  : 'bg-red-50 border border-red-200 text-red-800'
-              }`}>
-                <div className="flex items-center">
-                  <span className="mr-2">
-                    {message.type === 'success' ? '✅' : '❌'}
-                  </span>
-                  <span className="text-sm font-medium">{message.text}</span>
-                </div>
-              </div>
-            )}
-
             {/* Product Info */}
             <div className="glass-card rounded-xl p-4">
               <h3 className="text-lg font-semibold text-gray-800 mb-3">{product.name}</h3>

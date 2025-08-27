@@ -134,8 +134,8 @@ export function Dashboard() {
           product={selectedProduct}
           onClose={() => setSelectedProduct(null)}
           onUpdate={() => {
-            // Refetch products after mutation
-            window.location.reload();
+            // Close drawer after successful mutation
+            setSelectedProduct(null);
           }}
         />
       )}

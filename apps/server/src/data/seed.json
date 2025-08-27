@@ -3,8 +3,8 @@
     "id": "P-1001",
     "name": "12mm Hex Bolt",
     "sku": "HEX-12-100",
-    "warehouse": "BLR-A",
-    "stock": 180,
+    "warehouse": "DEL-B",
+    "stock": 153,
     "demand": 120
   },
   {
