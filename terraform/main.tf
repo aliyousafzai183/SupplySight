@@ -14,10 +14,10 @@ resource "render_web_service" "backend" {
 
   runtime_source = {
     native_runtime = {
-      repo_url       = var.github_repo_url
-      branch         = "main"
-      build_command  = "cd apps/server && npm install && npm run build"
-      runtime        = "node"
+      repo_url      = var.github_repo_url
+      branch        = "main"
+      build_command = "cd apps/server && npm install && npm run build"
+      runtime       = "node"
     }
   }
 
@@ -37,9 +37,9 @@ resource "render_web_service" "backend" {
 
 # Frontend Static Site
 resource "render_static_site" "frontend" {
-  name   = "supplysight-frontend"
+  name     = "supplysight-frontend"
   repo_url = var.github_repo_url
-  branch = "main"
+  branch   = "main"
 
   build_command = "cd apps/web && npm install && npm run build"
 
