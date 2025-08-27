@@ -20,3 +20,6 @@ jobs:
         run: npm run typecheck --workspace=apps/server
       - name: TypeScript - web
         run: npm run typecheck --workspace=apps/web
+        env:
+          VITE_GRAPHQL_URL: http://localhost:4000/graphql
+          VITE_SENTRY_DSN: ""

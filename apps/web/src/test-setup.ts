@@ -2,6 +2,10 @@ import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 import React from 'react';
 
+// Mock environment variables
+vi.stubEnv('VITE_GRAPHQL_URL', 'http://localhost:4000/graphql');
+vi.stubEnv('VITE_SENTRY_DSN', '');
+
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
