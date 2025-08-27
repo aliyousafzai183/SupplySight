@@ -1,6 +1,6 @@
 # SupplySight Dashboard
 
-A production-ready Daily Inventory Dashboard built with React, TypeScript, and GraphQL. This project demonstrates modern web development practices with a focus on clean architecture, excellent developer experience, and real-world quality gates.
+A production-ready Daily Inventory Dashboard built with React, TypeScript, and GraphQL. This project demonstrates modern web development practices with a focus on clean architecture, excellent developer experience, and comprehensive testing.
 
 ## 🚀 Features
 
@@ -29,10 +29,6 @@ A production-ready Daily Inventory Dashboard built with React, TypeScript, and G
 ### Filtered Results
 ![Filtered Results](docs/screenshots/filtered-results.png)
 *Dashboard with active filters showing critical stock items*
-
-### GitHub PR Checks
-![Required Checks](docs/screenshots/required-checks.png)
-*GitHub Actions CI/CD checks that must pass before merging to main branch*
 
 ## 📊 Dashboard Features
 
@@ -111,39 +107,6 @@ A production-ready Daily Inventory Dashboard built with React, TypeScript, and G
    - Frontend: http://localhost:5173
    - GraphQL Playground: http://localhost:4000/graphql
 
-### 🧪 Testing
-```bash
-# Run all tests
-npm run test
-
-# Run specific test suites
-npm run test:unit    # Unit tests only
-npm run test:watch   # Watch mode for development
-```
-
-## 📁 Project Structure
-
-```
-supply-sight/
-├── apps/
-│   ├── web/                    # React frontend
-│   │   ├── src/
-│   │   │   ├── app/
-│   │   │   │   ├── components/ # Reusable UI components
-│   │   │   │   └── routes/     # Page components
-│   │   │   ├── features/       # Feature-based organization
-│   │   │   │   └── products/   # Product domain
-│   │   │   └── lib/           # Utilities and config
-│   │   └── ...
-│   └── server/                 # GraphQL API
-│       ├── src/
-│       │   ├── resolvers/      # GraphQL resolvers
-│       │   ├── data/          # Seed data
-│       │   └── ...
-│       └── ...
-└── ...
-```
-
 ## 🧪 Testing
 
 The project includes comprehensive testing with 191 tests covering all components and utilities:
@@ -172,14 +135,27 @@ npm run lint
 - ✅ **Integration**: Complex workflows and data flows
 - ✅ **Accessibility**: ARIA labels and keyboard navigation
 
-## 🏗️ Building for Production
+## 📁 Project Structure
 
-```bash
-# Build both apps
-npm run build
-
-# Start production servers
-npm start
+```
+supply-sight/
+├── apps/
+│   ├── web/                    # React frontend
+│   │   ├── src/
+│   │   │   ├── app/
+│   │   │   │   ├── components/ # Reusable UI components
+│   │   │   │   └── routes/     # Page components
+│   │   │   ├── features/       # Feature-based organization
+│   │   │   │   └── products/   # Product domain
+│   │   │   └── lib/           # Utilities and config
+│   │   └── ...
+│   └── server/                 # GraphQL API
+│       ├── src/
+│       │   ├── resolvers/      # GraphQL resolvers
+│       │   ├── data/          # Seed data
+│       │   └── ...
+│       └── ...
+└── ...
 ```
 
 ## 🔧 Development Scripts
@@ -224,46 +200,16 @@ Each product includes realistic stock and demand values to demonstrate the statu
 - **Error Boundaries** - Graceful error handling
 - **Accessibility** - ARIA labels and keyboard navigation
 
-## 🚀 Deployment & CI/CD
+## 🚀 CI/CD
 
 ### GitHub Actions Workflows
 - **`lint.yml`** - ESLint checking on PRs
 - **`typecheck.yml`** - TypeScript compilation verification
 - **`test.yml`** - Unit test execution
 - **`build.yml`** - Production build verification
-- **`terraform-deploy.yml`** - Infrastructure deployment to Render
 - **`delete-branch.yml`** - Automatic branch cleanup after merge
 
-**All checks must pass before merging to main branch** - See screenshot above for the required checks interface.
-
-### Infrastructure as Code
-The project uses **Terraform** for infrastructure management:
-- **Infrastructure as Code** - Version-controlled infrastructure
-- **Automated Deployment** - GitHub Actions deploys on push to main
-- **Environment Management** - Easy to manage multiple environments
-- **Cost Optimization** - Free tier deployment on Render
-
-See `terraform/README.md` for detailed deployment instructions.
-
-### Vercel Deployment
-The application is designed for deployment on Vercel with:
-
-- **Environment Variables** - Secure configuration management
-- **Build Optimization** - Vite for fast builds
-- **CDN Integration** - Static asset optimization
-- **Preview Deployments** - Automatic PR deployments
-- **Production Deployments** - Automatic main branch deployments
-
-### Environment Configuration
-```bash
-# Development
-VITE_GRAPHQL_URL=http://localhost:4000/graphql
-VITE_SENTRY_DSN=
-
-# Production
-VITE_GRAPHQL_URL=https://your-api-domain.com/graphql
-VITE_SENTRY_DSN=https://your-sentry-dsn
-```
+**All checks must pass before merging to main branch**
 
 ## 📝 License
 
