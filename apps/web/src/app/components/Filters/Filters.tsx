@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import type { ProductsFilters } from '../features/products/types.js';
+import type { ProductsFilters } from '../../features/products/types';
 
 interface FiltersProps {
   filters: ProductsFilters;
@@ -49,10 +49,11 @@ export function Filters({ filters, onFiltersChange, warehouses, loading = false,
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         {/* Search */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="search-products" className="block text-sm font-medium text-gray-700 mb-2">
             Search Products
           </label>
           <input
+            id="search-products"
             type="text"
             placeholder="Search by name, SKU, or warehouse..."
             className="input-field w-full"
@@ -64,10 +65,11 @@ export function Filters({ filters, onFiltersChange, warehouses, loading = false,
 
         {/* Warehouse Filter */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="warehouse-filter" className="block text-sm font-medium text-gray-700 mb-2">
             Warehouse
           </label>
           <select
+            id="warehouse-filter"
             className="input-field w-full"
             value={localWarehouse}
             onChange={(e) => setLocalWarehouse(e.target.value)}
@@ -84,10 +86,11 @@ export function Filters({ filters, onFiltersChange, warehouses, loading = false,
 
         {/* Status Filter */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="status-filter" className="block text-sm font-medium text-gray-700 mb-2">
             Status
           </label>
           <select
+            id="status-filter"
             className="input-field w-full"
             value={localStatus}
             onChange={(e) => setLocalStatus(e.target.value)}
@@ -104,6 +107,7 @@ export function Filters({ filters, onFiltersChange, warehouses, loading = false,
       {/* Filter Actions */}
       <div className="flex justify-end space-x-3">
         <button
+          type="button"
           onClick={handleResetFilters}
           disabled={loading}
           className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
@@ -111,6 +115,7 @@ export function Filters({ filters, onFiltersChange, warehouses, loading = false,
           Reset
         </button>
         <button
+          type="button"
           onClick={handleApplyFilters}
           disabled={loading}
           className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"

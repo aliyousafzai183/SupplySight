@@ -1,5 +1,5 @@
 import { gql } from '@apollo/client';
-import type { KPI, ProductConnection } from './types.js';
+import type { KPI, ProductConnection } from '../types';
 
 export const GET_PRODUCTS = gql`
   query GetProducts(

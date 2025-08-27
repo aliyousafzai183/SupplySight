@@ -1,5 +1,5 @@
 import { createRootRoute, createRoute } from '@tanstack/react-router';
-import { Dashboard } from './routes/index.js';
+import { Dashboard } from './routes/index/index.tsx';
 
 const rootRoute = createRootRoute();
 

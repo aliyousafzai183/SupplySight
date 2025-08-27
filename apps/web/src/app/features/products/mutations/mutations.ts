@@ -1,5 +1,5 @@
 import { gql } from '@apollo/client';
-import type { Product } from './types.js';
+import type { Product } from '../types';
 
 export const UPDATE_DEMAND = gql`
   mutation UpdateDemand($id: ID!, $warehouse: String!, $demand: Int!) {

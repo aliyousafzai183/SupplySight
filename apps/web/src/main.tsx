@@ -3,9 +3,8 @@ import ReactDOM from 'react-dom/client';
 import { ApolloProvider } from '@apollo/client';
 import { RouterProvider } from '@tanstack/react-router';
 import { Toaster } from 'react-hot-toast';
-import { client } from './app/lib/apollo.ts';
+import { client, toastConfig } from './app/lib';
 import { router } from './app/router.ts';
-import { toastConfig } from './app/lib/toast.ts';
 import './globals.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

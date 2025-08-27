@@ -1,6 +1,6 @@
 
 import { LineChart as RechartsLineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import type { KPI } from '../features/products/types.js';
+import type { KPI } from '../../features/products/types';
 
 interface LineChartProps {
   data: KPI[];
@@ -71,7 +71,7 @@ export function LineChart({ data, loading = false }: LineChartProps) {
   }
 
   return (
-    <div className="chart-container">
+    <div className="chart-container" data-testid="chart-container">
       <div className="h-80">
       <ResponsiveContainer width="100%" height="100%">
         <RechartsLineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
