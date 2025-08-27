@@ -197,86 +197,109 @@ const fillRate = totalDemand > 0
 
 ## Recent Improvements (Post-Initial Implementation)
 
-### ✅ Pagination Implementation
-**Added**: Server-side pagination with ProductConnection type
-**Features**:
-- Page-based navigation with Previous/Next buttons
-- Page number display with ellipsis for large page counts
-- URL state persistence for current page
-- Automatic page reset when filters change
+### ✅ Stock Transfer Bug Fix
+**Fixed**: Critical bug where transferring stock to a new warehouse cloned the product instead of creating a new entry
+**Problem**: Apollo Client cache collision for products with same ID in different warehouses
+**Solution**: Modified Apollo Client's `typePolicies` to use composite key `['id', 'warehouse']` for Product entities
+**Impact**: Stock transfers now work correctly, creating new products in target warehouses
 
-**Technical Details**:
-```typescript
-type ProductConnection {
-  products: [Product!]!
-  totalCount: Int!
-  hasNextPage: Boolean!
-  hasPreviousPage: Boolean!
-  currentPage: Int!
-  totalPages: Int!
-}
-```
+### ✅ Demand Update Bug Fix
+**Fixed**: `updateDemand` mutation affecting incorrect products due to only using `id`
+**Problem**: Backend resolver only used product ID, not distinguishing by warehouse
+**Solution**: Updated GraphQL schema, backend resolver, frontend mutation, and Apollo cache logic to include `warehouse` as distinguishing factor
+**Impact**: Demand updates now correctly target specific products in specific warehouses
 
-### ✅ URL State Management
-**Added**: TanStack Router integration for URL-driven state
+### ✅ Filter Persistence Enhancement
+**Added**: URL-based filter persistence instead of localStorage
 **Features**:
-- All filters persisted in URL search parameters
+- All filters (search, warehouse, status, page) persisted in URL search parameters
 - Browser back/forward navigation support
 - Shareable URLs with current filter state
 - Automatic state synchronization
 
 **Implementation**:
 ```typescript
-const search = useSearch({ from: '/' });
-const updateSearch = (updates: Partial<typeof search>) => {
-  navigate({
-    to: '/',
-    search: { ...search, ...updates }
-  });
+const parseQueryParams = (): { initFilters: ProductsFilters; initRange: '7d' | '14d' | '30d' } => {
+  const params = new URLSearchParams(window.location.search);
+  // Parse filters from URL...
 };
+
+useEffect(() => {
+  const params = new URLSearchParams();
+  // Update URL when filters change...
+  window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
+}, [filters, kpiRange]);
 ```
 
-### ✅ Optimistic Updates
-**Added**: Immediate UI updates for mutations
+### ✅ Date Range Enhancement
+**Added**: Date range chips moved to top bar affecting entire page
 **Features**:
-- Instant feedback for demand updates and stock transfers
-- Automatic rollback on server errors
-- Improved perceived performance
-- Better user experience
+- Date range selection affects both KPI cards and line chart
+- Visual enhancement with better color scheme for chips
+- Responsive design for mobile devices
 
-**Implementation**:
-```typescript
-await updateDemand({
-  variables: { id, demand },
-  optimisticResponse: {
-    updateDemand: {
-      __typename: 'Product',
-      ...product,
-      demand: parseInt(demand)
-    }
-  }
-});
+### ✅ Comprehensive Test Coverage
+**Added**: Complete test suite covering all components and utilities
+**Coverage**:
+- 18 test files with 191 individual tests
+- Unit tests for all components, utilities, and GraphQL operations
+- Integration tests for complex workflows
+- Mock setup for external dependencies (recharts, react-hot-toast, etc.)
+
+**Test Structure**:
+```
+✅ Components: KPICard, StatusPill, Pagination, Filters, ProductsTable, Drawer
+✅ Routes: Main dashboard route
+✅ Features: Product types, queries, mutations
+✅ Utilities: Status logic, formatting, environment validation
+✅ Integration: Apollo Client, environment setup
 ```
 
-### ✅ Code Splitting
-**Added**: Vite build optimization with manual chunks
+### ✅ GitHub Actions CI/CD
+**Added**: Separate workflows for different concerns
+**Workflows**:
+- `lint.yml` - ESLint checking
+- `typecheck.yml` - TypeScript compilation
+- `test.yml` - Unit test execution
+- `build.yml` - Production build verification
+- `delete-branch.yml` - Automatic branch cleanup
+
 **Features**:
-- Vendor bundle separation (React, React-DOM)
-- Apollo Client bundle separation
-- Router bundle separation
-- Charts bundle separation
-- Reduced initial bundle size
+- Environment variables properly configured for CI
+- Beautiful PR template with checkboxes
+- Automatic branch deletion after merge
+- Separate workflows for better visibility
 
-**Results**:
-- Main bundle: 74.33 kB (was 799.78 kB)
-- Vendor bundle: 141.00 kB
-- Apollo bundle: 201.46 kB
-- Charts bundle: 382.31 kB
+### ✅ Code Organization Enhancement
+**Added**: Wrapper folder structure with barrel exports
+**Structure**:
+```
+components/
+├── KPICard/
+│   ├── KPICard.tsx
+│   ├── KPICard.unit.test.tsx
+│   └── index.ts
+├── StatusPill/
+│   ├── StatusPill.tsx
+│   ├── StatusPill.unit.test.tsx
+│   └── index.ts
+└── ...
+```
 
-### ✅ TypeScript Version Fix
-**Fixed**: Downgraded TypeScript to 5.3.3
-**Rationale**: Resolves ESLint compatibility warnings
-**Impact**: Cleaner build output without warnings
+**Benefits**:
+- Better organization and discoverability
+- Co-located tests with components
+- Clean import paths with barrel exports
+- Easier maintenance and refactoring
+
+### ✅ Environment Variable Fix
+**Fixed**: GitHub Actions environment variable issues
+**Problem**: Tests failing in CI due to missing `VITE_GRAPHQL_URL` environment variable
+**Solution**: 
+- Added environment variables to all relevant workflows
+- Updated Zod schema with default values
+- Added environment mocking in test setup
+**Impact**: All tests now pass in both local and CI environments
 
 ## Future Improvements
 
