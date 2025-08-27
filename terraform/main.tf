@@ -2,69 +2,69 @@
 
 # Configure the Render Provider
 provider "render" {
-  # API token will be read from RENDER_TOKEN environment variable
+  # API token will be read from RENDER_API_KEY environment variable
+  # Owner ID will be read from RENDER_OWNER_ID environment variable
 }
 
 # Backend GraphQL Service
-resource "render_service" "backend" {
+resource "render_web_service" "backend" {
   name   = "supplysight-backend"
-  type   = "web_service"
   plan   = "free"
-  repo   = var.github_repo_url
-  branch = "main"
+  region = "oregon"
 
-  build_command = "cd apps/server && npm install && npm run build"
+  runtime_source = {
+    native_runtime = {
+      repo_url       = var.github_repo_url
+      branch         = "main"
+      build_command  = "cd apps/server && npm install && npm run build"
+      runtime        = "node"
+    }
+  }
+
   start_command = "cd apps/server && npm start"
 
-  env_vars = [
-    {
-      key   = "NODE_ENV"
+  env_vars = {
+    NODE_ENV = {
       value = "production"
-    },
-    {
-      key   = "PORT"
+    }
+    PORT = {
       value = "10000"
     }
-  ]
+  }
 
   health_check_path = "/graphql"
 }
 
 # Frontend Static Site
-resource "render_service" "frontend" {
+resource "render_static_site" "frontend" {
   name   = "supplysight-frontend"
-  type   = "static_site"
-  plan   = "free"
-  repo   = var.github_repo_url
+  repo_url = var.github_repo_url
   branch = "main"
 
   build_command = "cd apps/web && npm install && npm run build"
-  publish_dir   = "apps/web/dist"
 
-  env_vars = [
-    {
-      key   = "VITE_GRAPHQL_URL"
-      value = "https://${render_service.backend.service_id}.onrender.com/graphql"
-    },
-    {
-      key   = "VITE_SENTRY_DSN"
+  env_vars = {
+    VITE_GRAPHQL_URL = {
+      value = "https://${render_web_service.backend.id}.onrender.com/graphql"
+    }
+    VITE_SENTRY_DSN = {
       value = ""
     }
-  ]
+  }
 }
 
 # Output the service URLs
 output "backend_url" {
   description = "Backend GraphQL service URL"
-  value       = "https://${render_service.backend.service_id}.onrender.com"
+  value       = "https://${render_web_service.backend.id}.onrender.com"
 }
 
 output "frontend_url" {
   description = "Frontend static site URL"
-  value       = "https://${render_service.frontend.service_id}.onrender.com"
+  value       = "https://${render_static_site.frontend.id}.onrender.com"
 }
 
 output "graphql_playground_url" {
   description = "GraphQL Playground URL"
-  value       = "https://${render_service.backend.service_id}.onrender.com/graphql"
+  value       = "https://${render_web_service.backend.id}.onrender.com/graphql"
 }
