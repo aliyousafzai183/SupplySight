@@ -22,7 +22,11 @@ const yoga = createYoga({
   schema,
   cors: {
     origin: process.env.NODE_ENV === 'production' 
-      ? ['https://supply-sight-dev.vercel.app', 'https://supply-sight-prod.vercel.app']
+      ? [
+          'https://supplysight-frontend.onrender.com',
+          'https://supply-sight-dev.vercel.app', 
+          'https://supply-sight-prod.vercel.app'
+        ]
       : ['http://localhost:5173'],
     credentials: true
   }
