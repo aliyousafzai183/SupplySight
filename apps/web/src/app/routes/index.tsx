@@ -13,7 +13,9 @@ export function Dashboard() {
   const [filters, setFilters] = useState<ProductsFilters>({
     search: '',
     warehouse: '',
-    status: undefined
+    status: undefined,
+    page: 1,
+    pageSize: 10
   });
   const [kpiRange, setKpiRange] = useState<'7d' | '14d' | '30d'>('7d');
 
@@ -27,14 +29,21 @@ export function Dashboard() {
     variables: { range: kpiRange }
   });
 
-  const products = useMemo(() => productsData?.products || [], [productsData]);
+  const productsConnection = useMemo(() => productsData?.products || { 
+    products: [], 
+    totalCount: 0, 
+    hasNextPage: false, 
+    hasPreviousPage: false, 
+    currentPage: 1, 
+    totalPages: 1 
+  }, [productsData]);
   const warehouses = useMemo(() => warehousesData?.warehouses || [], [warehousesData]);
   const kpis = useMemo(() => kpisData?.kpis || [], [kpisData]);
 
-  const totalStock = products.reduce((sum: number, p: Product) => sum + p.stock, 0);
-  const totalDemand = products.reduce((sum: number, p: Product) => sum + p.demand, 0);
+  const totalStock = productsConnection.products.reduce((sum: number, p: Product) => sum + p.stock, 0);
+  const totalDemand = productsConnection.products.reduce((sum: number, p: Product) => sum + p.demand, 0);
   const fillRate = totalDemand > 0 
-    ? products.reduce((sum: number, p: Product) => sum + Math.min(p.stock, p.demand), 0) / totalDemand * 100
+    ? productsConnection.products.reduce((sum: number, p: Product) => sum + Math.min(p.stock, p.demand), 0) / totalDemand * 100
     : 0;
 
   return (
@@ -93,7 +102,12 @@ export function Dashboard() {
         {/* Filters */}
         <Filters
           filters={filters}
-          onFiltersChange={(prev: ProductsFilters) => setFilters(prev)}
+          onFiltersChange={(newFilters: ProductsFilters) => {
+            setFilters({
+              ...newFilters,
+              page: 1 // Reset to first page when filters change
+            });
+          }}
           warehouses={warehouses}
           loading={warehousesLoading}
           className="filters-container"
@@ -101,9 +115,10 @@ export function Dashboard() {
 
         {/* Products Table */}
         <ProductsTable
-          products={products}
+          data={productsConnection}
           loading={productsLoading}
           onProductClick={setSelectedProduct}
+          onPageChange={(page) => setFilters(prev => ({ ...prev, page }))}
         />
       </div>
 

@@ -23,6 +23,15 @@ export interface ProductsFilters {
   pageSize?: number;
 }
 
+export interface ProductConnection {
+  products: Product[];
+  totalCount: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  currentPage: number;
+  totalPages: number;
+}
+
 export interface UpdateDemandInput {
   id: string;
   demand: number;

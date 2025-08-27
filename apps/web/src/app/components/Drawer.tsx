@@ -29,8 +29,15 @@ export function Drawer({ product, onClose, onUpdate }: DrawerProps) {
     try {
       await updateDemand({
         variables: {
-          productId: product.id,
+          id: product.id,
           demand: parseInt(demand)
+        },
+        optimisticResponse: {
+          updateDemand: {
+            __typename: 'Product',
+            ...product,
+            demand: parseInt(demand)
+          }
         }
       });
       onUpdate?.();
@@ -48,9 +55,18 @@ export function Drawer({ product, onClose, onUpdate }: DrawerProps) {
     try {
       await transferStock({
         variables: {
-          productId: product.id,
-          amount: parseInt(transferAmount),
-          targetWarehouse
+          id: product.id,
+          qty: parseInt(transferAmount),
+          from: product.warehouse,
+          to: targetWarehouse
+        },
+        optimisticResponse: {
+          transferStock: {
+            __typename: 'Product',
+            ...product,
+            warehouse: targetWarehouse,
+            stock: product.stock - parseInt(transferAmount)
+          }
         }
       });
       onUpdate?.();

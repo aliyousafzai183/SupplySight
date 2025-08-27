@@ -22,6 +22,15 @@ export const typeDefs = gql`
     demand: Int!
   }
 
+  type ProductConnection {
+    products: [Product!]!
+    totalCount: Int!
+    hasNextPage: Boolean!
+    hasPreviousPage: Boolean!
+    currentPage: Int!
+    totalPages: Int!
+  }
+
   type Query {
     products(
       search: String
@@ -29,7 +38,7 @@ export const typeDefs = gql`
       status: Status
       page: Int = 1
       pageSize: Int = 10
-    ): [Product!]!
+    ): ProductConnection!
     warehouses: [String!]!
     kpis(range: Int!): [KPI!]!
   }

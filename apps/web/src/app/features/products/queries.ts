@@ -1,5 +1,5 @@
 import { gql } from '@apollo/client';
-import type { Product, KPI } from './types.js';
+import type { KPI, ProductConnection } from './types.js';
 
 export const GET_PRODUCTS = gql`
   query GetProducts(
@@ -16,12 +16,19 @@ export const GET_PRODUCTS = gql`
       page: $page
       pageSize: $pageSize
     ) {
-      id
-      name
-      sku
-      warehouse
-      stock
-      demand
+      products {
+        id
+        name
+        sku
+        warehouse
+        stock
+        demand
+      }
+      totalCount
+      hasNextPage
+      hasPreviousPage
+      currentPage
+      totalPages
     }
   }
 `;
@@ -43,7 +50,7 @@ export const GET_KPIS = gql`
 `;
 
 export interface GetProductsData {
-  products: Product[];
+  products: ProductConnection;
 }
 
 export interface GetProductsVariables {

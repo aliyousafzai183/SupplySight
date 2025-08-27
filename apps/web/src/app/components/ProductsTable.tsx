@@ -1,15 +1,17 @@
 
-import type { Product } from '../features/products/types.js';
+import type { Product, ProductConnection } from '../features/products/types.js';
 import { StatusPill } from './StatusPill.js';
 import { getStatus } from '../lib/status.js';
+import { Pagination } from './Pagination.js';
 
 interface ProductsTableProps {
-  products: Product[];
+  data: ProductConnection;
   loading?: boolean;
   onProductClick: (product: Product) => void;
+  onPageChange: (page: number) => void;
 }
 
-export function ProductsTable({ products, loading = false, onProductClick }: ProductsTableProps) {
+export function ProductsTable({ data, loading = false, onProductClick, onPageChange }: ProductsTableProps) {
   if (loading) {
     return (
       <div className="table-container">
@@ -25,7 +27,7 @@ export function ProductsTable({ products, loading = false, onProductClick }: Pro
     );
   }
 
-  if (products.length === 0) {
+  if (data.products.length === 0) {
     return (
       <div className="table-container">
         <div className="p-8 text-center">
@@ -53,7 +55,7 @@ export function ProductsTable({ products, loading = false, onProductClick }: Pro
               </tr>
             </thead>
             <tbody>
-              {products.map((product) => {
+              {data.products.map((product: Product) => {
                 const status = getStatus(product.stock, product.demand);
                 const isCritical = status === 'CRITICAL';
                 
@@ -79,7 +81,7 @@ export function ProductsTable({ products, loading = false, onProductClick }: Pro
                     <td className="py-4 px-4 text-right font-medium text-gray-900">
                       {product.demand.toLocaleString()}
                     </td>
-                    <td className="py-4 px-4 text-center">
+                    <td className="text-center py-4 px-4">
                       <StatusPill status={status} />
                     </td>
                   </tr>
@@ -87,6 +89,16 @@ export function ProductsTable({ products, loading = false, onProductClick }: Pro
               })}
             </tbody>
           </table>
+        </div>
+        
+        <div className="mt-6">
+          <Pagination
+            currentPage={data.currentPage}
+            totalPages={data.totalPages}
+            hasNextPage={data.hasNextPage}
+            hasPreviousPage={data.hasPreviousPage}
+            onPageChange={onPageChange}
+          />
         </div>
       </div>
     </div>

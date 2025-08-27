@@ -18,7 +18,8 @@ export default {
     'kpi-card',
     'chart-container',
     'filters-container',
-    'table-container'
+    'table-container',
+    'debug-class'
   ],
   theme: {
     extend: {

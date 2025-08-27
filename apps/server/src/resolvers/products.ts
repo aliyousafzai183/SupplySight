@@ -76,14 +76,27 @@ export const productsResolver = {
     const endIndex = startIndex + pageSize;
     const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
 
+    const totalCount = filteredProducts.length;
+    const totalPages = Math.ceil(totalCount / pageSize);
+    const hasNextPage = page < totalPages;
+    const hasPreviousPage = page > 1;
+
     logInfo('Products query result', {
-      total: filteredProducts.length,
+      total: totalCount,
       returned: paginatedProducts.length,
       page,
-      pageSize
+      pageSize,
+      totalPages
     });
 
-    return paginatedProducts;
+    return {
+      products: paginatedProducts,
+      totalCount,
+      hasNextPage,
+      hasPreviousPage,
+      currentPage: page,
+      totalPages
+    };
   },
 
   warehouses: async () => {
