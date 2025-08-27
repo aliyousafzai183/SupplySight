@@ -34,6 +34,7 @@ jobs:
         working-directory: terraform
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_OWNER_ID: ${{ secrets.RENDER_OWNER_ID }}
         run: |
           terraform plan \
             -var="render_token=$RENDER_API_KEY" \
@@ -44,6 +45,7 @@ jobs:
         working-directory: terraform
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_OWNER_ID: ${{ secrets.RENDER_OWNER_ID }}
         run: |
           terraform apply -auto-approve tfplan
 
