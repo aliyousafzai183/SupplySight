@@ -20,13 +20,19 @@ export function Dashboard() {
   const [kpiRange, setKpiRange] = useState<'7d' | '14d' | '30d'>('7d');
 
   const { data: productsData, loading: productsLoading } = useQuery(GET_PRODUCTS, {
-    variables: { filters }
+    variables: { 
+      search: filters.search,
+      warehouse: filters.warehouse,
+      status: filters.status,
+      page: filters.page,
+      pageSize: filters.pageSize
+    }
   });
 
   const { data: warehousesData, loading: warehousesLoading } = useQuery(GET_WAREHOUSES);
 
   const { data: kpisData, loading: kpisLoading } = useQuery(GET_KPIS, {
-    variables: { range: kpiRange }
+    variables: { range: parseInt(kpiRange) }
   });
 
   const productsConnection = useMemo(() => productsData?.products || { 

@@ -1,5 +1,5 @@
 
-import { useDebouncedCallback } from 'use-debounce';
+import { useState, useEffect } from 'react';
 import type { ProductsFilters } from '../features/products/types.js';
 
 interface FiltersProps {
@@ -11,16 +11,42 @@ interface FiltersProps {
 }
 
 export function Filters({ filters, onFiltersChange, warehouses, loading = false, className = '' }: FiltersProps) {
-  const debouncedSearch = useDebouncedCallback(
-    (value: string) => {
-      onFiltersChange({ ...filters, search: value });
-    },
-    300
-  );
+  const [localSearch, setLocalSearch] = useState(filters.search || '');
+  const [localWarehouse, setLocalWarehouse] = useState(filters.warehouse || '');
+  const [localStatus, setLocalStatus] = useState<string>(filters.status || '');
+
+  // Sync local state with props when filters change
+  useEffect(() => {
+    setLocalSearch(filters.search || '');
+    setLocalWarehouse(filters.warehouse || '');
+    setLocalStatus(filters.status || '');
+  }, [filters.search, filters.warehouse, filters.status]);
+
+  const handleApplyFilters = () => {
+    onFiltersChange({
+      ...filters,
+      search: localSearch,
+      warehouse: localWarehouse,
+      status: (localStatus as 'HEALTHY' | 'LOW' | 'CRITICAL') || undefined
+    });
+  };
+
+  const handleResetFilters = () => {
+    setLocalSearch('');
+    setLocalWarehouse('');
+    setLocalStatus('');
+    onFiltersChange({
+      search: '',
+      warehouse: '',
+      status: undefined,
+      page: 1,
+      pageSize: 10
+    });
+  };
 
   return (
     <div className={`filters-container ${className}`}>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         {/* Search */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -30,7 +56,8 @@ export function Filters({ filters, onFiltersChange, warehouses, loading = false,
             type="text"
             placeholder="Search by name, SKU, or warehouse..."
             className="input-field w-full"
-            onChange={(e) => debouncedSearch(e.target.value)}
+            value={localSearch}
+            onChange={(e) => setLocalSearch(e.target.value)}
             disabled={loading}
           />
         </div>
@@ -42,8 +69,8 @@ export function Filters({ filters, onFiltersChange, warehouses, loading = false,
           </label>
           <select
             className="input-field w-full"
-            value={filters.warehouse}
-            onChange={(e) => onFiltersChange({ ...filters, warehouse: e.target.value })}
+            value={localWarehouse}
+            onChange={(e) => setLocalWarehouse(e.target.value)}
             disabled={loading}
           >
             <option value="">All Warehouses</option>
@@ -62,8 +89,8 @@ export function Filters({ filters, onFiltersChange, warehouses, loading = false,
           </label>
           <select
             className="input-field w-full"
-            value={filters.status}
-            onChange={(e) => onFiltersChange({ ...filters, status: (e.target.value as 'HEALTHY' | 'LOW' | 'CRITICAL') || undefined })}
+            value={localStatus}
+            onChange={(e) => setLocalStatus(e.target.value)}
             disabled={loading}
           >
             <option value="">All Status</option>
@@ -72,6 +99,24 @@ export function Filters({ filters, onFiltersChange, warehouses, loading = false,
             <option value="CRITICAL">Critical</option>
           </select>
         </div>
+      </div>
+
+      {/* Filter Actions */}
+      <div className="flex justify-end space-x-3">
+        <button
+          onClick={handleResetFilters}
+          disabled={loading}
+          className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Reset
+        </button>
+        <button
+          onClick={handleApplyFilters}
+          disabled={loading}
+          className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Apply Filters
+        </button>
       </div>
     </div>
   );

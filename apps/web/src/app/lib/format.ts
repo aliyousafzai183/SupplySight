@@ -3,7 +3,7 @@ export const formatNumber = (num: number): string => {
 };
 
 export const formatPercentage = (value: number): string => {
-  return `${(value * 100).toFixed(1)}%`;
+  return `${value.toFixed(1)}%`;
 };
 
 export const formatDate = (dateString: string): string => {
