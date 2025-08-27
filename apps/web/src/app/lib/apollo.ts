@@ -19,9 +19,13 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 export const client = new ApolloClient({
   link: from([errorLink, httpLink]),
   cache: new InMemoryCache({
+    // Use a composite key (id + warehouse) to distinguish the same product
+    // stored in different warehouses. This prevents cache collisions when
+    // transferring stock, where the same product ID can exist in multiple
+    // warehouses with independent stock/demand values.
     typePolicies: {
       Product: {
-        keyFields: ['id'],
+        keyFields: ['id', 'warehouse'],
       },
     },
   }),

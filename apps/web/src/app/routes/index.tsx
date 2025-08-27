@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useQuery } from '@apollo/client';
 import { GET_PRODUCTS, GET_WAREHOUSES, GET_KPIS } from '../features/products/queries.js';
 import { KPICard } from '../components/KPICard.js';
@@ -10,14 +10,25 @@ import type { Product, ProductsFilters } from '../features/products/types.js';
 
 export function Dashboard() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [filters, setFilters] = useState<ProductsFilters>({
-    search: '',
-    warehouse: '',
-    status: undefined,
-    page: 1,
-    pageSize: 10
-  });
-  const [kpiRange, setKpiRange] = useState<'7d' | '14d' | '30d'>('7d');
+
+  // --- URL <-> State sync helpers ---
+  const parseQueryParams = (): { initFilters: ProductsFilters; initRange: '7d' | '14d' | '30d' } => {
+    const params = new URLSearchParams(window.location.search);
+    const initFilters: ProductsFilters = {
+      search: params.get('search') || '',
+      warehouse: params.get('warehouse') || '',
+      status: params.get('status') as 'HEALTHY' | 'LOW' | 'CRITICAL' | undefined,
+      page: params.get('page') ? parseInt(params.get('page')!) : 1,
+      pageSize: 10
+    };
+    const range = (params.get('range') as '7d' | '14d' | '30d') || '7d';
+    return { initFilters, initRange: range };
+  };
+
+  const { initFilters, initRange } = parseQueryParams();
+
+  const [filters, setFilters] = useState<ProductsFilters>(initFilters);
+  const [kpiRange, setKpiRange] = useState<'7d' | '14d' | '30d'>(initRange);
 
   const { data: productsData, loading: productsLoading } = useQuery(GET_PRODUCTS, {
     variables: { 
@@ -51,6 +62,18 @@ export function Dashboard() {
   const fillRate = totalDemand > 0 
     ? productsConnection.products.reduce((sum: number, p: Product) => sum + Math.min(p.stock, p.demand), 0) / totalDemand * 100
     : 0;
+
+  // Sync URL whenever filters or range change
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (filters.search) params.set('search', filters.search);
+    if (filters.warehouse) params.set('warehouse', filters.warehouse);
+    if (filters.status) params.set('status', filters.status);
+    if (filters.page && filters.page !== 1) params.set('page', filters.page.toString());
+    params.set('range', kpiRange);
+    // Use replaceState to avoid polluting history stack
+    window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
+  }, [filters, kpiRange]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">

@@ -2,8 +2,8 @@ import { gql } from '@apollo/client';
 import type { Product } from './types.js';
 
 export const UPDATE_DEMAND = gql`
-  mutation UpdateDemand($id: ID!, $demand: Int!) {
-    updateDemand(id: $id, demand: $demand) {
+  mutation UpdateDemand($id: ID!, $warehouse: String!, $demand: Int!) {
+    updateDemand(id: $id, warehouse: $warehouse, demand: $demand) {
       id
       name
       sku
@@ -33,6 +33,7 @@ export interface UpdateDemandData {
 
 export interface UpdateDemandVariables {
   id: string;
+  warehouse: string;
   demand: number;
 }
 

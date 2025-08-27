@@ -12,51 +12,51 @@
   .glass-card {
     @apply bg-white/80 backdrop-blur-sm border border-white/20 shadow-xl;
   }
-  
+
   .gradient-bg {
     @apply bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600;
   }
-  
+
   .kpi-card {
     @apply glass-card rounded-2xl p-6;
   }
-  
+
   .btn-primary {
     @apply bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-2 px-4 rounded-lg;
   }
-  
+
   .btn-secondary {
     @apply bg-white/60 text-gray-600 hover:bg-white/80 font-medium py-2 px-4 rounded-lg transition-all duration-200;
   }
-  
+
   .status-healthy {
     @apply bg-gradient-to-r from-emerald-400 to-green-500 text-white;
   }
-  
+
   .status-low {
     @apply bg-gradient-to-r from-amber-400 to-orange-500 text-white;
   }
-  
+
   .status-critical {
     @apply bg-gradient-to-r from-red-400 to-pink-500 text-white;
   }
-  
+
   .table-row-hover {
     @apply hover:bg-gray-50/80 cursor-pointer transition-colors duration-200;
   }
-  
+
   .input-field {
     @apply w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent;
   }
-  
+
   .chart-container {
     @apply glass-card rounded-2xl p-6;
   }
-  
+
   .filters-container {
     @apply glass-card rounded-2xl p-6 mb-6;
   }
-  
+
   .table-container {
     @apply glass-card rounded-2xl overflow-hidden;
   }

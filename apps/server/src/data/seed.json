@@ -3,9 +3,9 @@
     "id": "P-1001",
     "name": "12mm Hex Bolt",
     "sku": "HEX-12-100",
-    "warehouse": "DEL-B",
-    "stock": 153,
-    "demand": 120
+    "warehouse": "BLR-A",
+    "stock": 180,
+    "demand": 150
   },
   {
     "id": "P-1002",
@@ -13,15 +13,15 @@
     "sku": "WSR-08-500",
     "warehouse": "BLR-A",
     "stock": 50,
-    "demand": 80
+    "demand": 50
   },
   {
     "id": "P-1003",
     "name": "M8 Nut",
     "sku": "NUT-08-200",
-    "warehouse": "BLR-A",
-    "stock": 79,
-    "demand": 999
+    "warehouse": "PNQ-C",
+    "stock": 80,
+    "demand": 80
   },
   {
     "id": "P-1004",
@@ -29,6 +29,174 @@
     "sku": "BRG-608-50",
     "warehouse": "DEL-B",
     "stock": 24,
+    "demand": 20
+  },
+  {
+    "id": "P-1005",
+    "name": "8mm Hex Bolt",
+    "sku": "HEX-08-100",
+    "warehouse": "BLR-A",
+    "stock": 200,
+    "demand": 150
+  },
+  {
+    "id": "P-1006",
+    "name": "Spring Washer",
+    "sku": "WSR-10-300",
+    "warehouse": "BLR-A",
+    "stock": 60,
+    "demand": 60
+  },
+  {
+    "id": "P-1007",
+    "name": "Lock Nut",
+    "sku": "NUT-10-100",
+    "warehouse": "PNQ-C",
+    "stock": 40,
+    "demand": 80
+  },
+  {
+    "id": "P-1008",
+    "name": "Deep Groove Bearing",
+    "sku": "BRG-6200",
+    "warehouse": "DEL-B",
+    "stock": 30,
+    "demand": 100
+  },
+  {
+    "id": "P-1009",
+    "name": "Socket Head Screw",
+    "sku": "SCR-06-050",
+    "warehouse": "BLR-A",
+    "stock": 90,
+    "demand": 70
+  },
+  {
+    "id": "P-1010",
+    "name": "Countersunk Screw",
+    "sku": "SCR-05-030",
+    "warehouse": "PNQ-C",
+    "stock": 120,
+    "demand": 110
+  },
+  {
+    "id": "P-1011",
+    "name": "Flat Washer",
+    "sku": "WSR-06-400",
+    "warehouse": "DEL-B",
+    "stock": 75,
+    "demand": 90
+  },
+  {
+    "id": "P-1012",
+    "name": "Hex Nut",
+    "sku": "NUT-06-150",
+    "warehouse": "BLR-A",
+    "stock": 140,
+    "demand": 100
+  },
+  {
+    "id": "P-1013",
+    "name": "Thrust Bearing",
+    "sku": "BRG-51100",
+    "warehouse": "PNQ-C",
+    "stock": 20,
+    "demand": 60
+  },
+  {
+    "id": "P-1014",
+    "name": "Wood Screw",
+    "sku": "SCR-04-020",
+    "warehouse": "DEL-B",
+    "stock": 180,
+    "demand": 90
+  },
+  {
+    "id": "P-1015",
+    "name": "Machine Screw",
+    "sku": "SCR-03-015",
+    "warehouse": "BLR-A",
+    "stock": 160,
+    "demand": 120
+  },
+  {
+    "id": "P-1016",
+    "name": "Nylock Nut",
+    "sku": "NUT-08-150",
+    "warehouse": "PNQ-C",
+    "stock": 55,
+    "demand": 55
+  },
+  {
+    "id": "P-1017",
+    "name": "Wave Washer",
+    "sku": "WSR-12-200",
+    "warehouse": "BLR-A",
+    "stock": 30,
+    "demand": 90
+  },
+  {
+    "id": "P-1018",
+    "name": "Taper Roller Bearing",
+    "sku": "BRG-30305",
+    "warehouse": "DEL-B",
+    "stock": 25,
+    "demand": 70
+  },
+  {
+    "id": "P-1019",
+    "name": "Carriage Bolt",
+    "sku": "HEX-10-120",
+    "warehouse": "PNQ-C",
+    "stock": 110,
+    "demand": 130
+  },
+  {
+    "id": "P-1020",
+    "name": "Pan Head Screw",
+    "sku": "SCR-06-060",
+    "warehouse": "BLR-A",
+    "stock": 95,
+    "demand": 95
+  },
+  {
+    "id": "P-1021",
+    "name": "Nylock Washer",
+    "sku": "WSR-14-100",
+    "warehouse": "DEL-B",
+    "stock": 45,
+    "demand": 100
+  },
+  {
+    "id": "P-1022",
+    "name": "Split Pin",
+    "sku": "PIN-05-020",
+    "warehouse": "PNQ-C",
+    "stock": 70,
+    "demand": 50
+  },
+  {
+    "id": "P-1023",
+    "name": "Circlip",
+    "sku": "CLP-20-005",
+    "warehouse": "BLR-A",
+    "stock": 150,
+    "demand": 140
+  },
+  {
+    "id": "P-1024",
+    "name": "Set Screw",
+    "sku": "SCR-02-010",
+    "warehouse": "DEL-B",
+    "stock": 85,
+    "demand": 60
+  },
+  {
+    "id": "P-1025",
+    "name": "Self-tapping Screw",
+    "sku": "SCR-04-025",
+    "warehouse": "PNQ-C",
+    "stock": 100,
     "demand": 120
   }
 ]

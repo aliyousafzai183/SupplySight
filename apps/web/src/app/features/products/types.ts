@@ -34,6 +34,7 @@ export interface ProductConnection {
 
 export interface UpdateDemandInput {
   id: string;
+  warehouse: string;
   demand: number;
 }
 

@@ -4,9 +4,17 @@ import { fileURLToPath } from 'url';
 import { logInfo } from '../logger.js';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
-const seedData = JSON.parse(
+
+// Read initial data
+let seedData = JSON.parse(
   readFileSync(join(__dirname, '../data/seed.json'), 'utf-8')
 );
+
+// Export function to get current data (for mutations to use)
+export const getCurrentData = () => seedData;
+export const setCurrentData = (data: any[]) => {
+  seedData = data;
+};
 
 export type Product = {
   id: string;

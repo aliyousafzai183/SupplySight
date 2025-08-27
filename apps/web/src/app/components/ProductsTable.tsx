@@ -151,7 +151,7 @@ export function ProductsTable({ data, loading = false, onProductClick, onPageCha
                 
                 return (
                   <tr
-                    key={product.id}
+                    key={`${product.id}-${product.warehouse}`}
                     onClick={() => onProductClick(product)}
                     className={`table-row-hover border-b border-gray-100 ${
                       isCritical ? 'bg-red-50/50' : ''
