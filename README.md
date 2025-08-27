@@ -12,6 +12,26 @@ A production-ready Daily Inventory Dashboard built with React, TypeScript, and G
 - **Responsive Design** - Mobile-first approach with Tailwind CSS
 - **Production Ready** - Error handling, loading states, and accessibility
 
+## 📸 Screenshots
+
+> **Note**: Screenshots are placeholders. Please add actual screenshots of your running application to the `docs/screenshots/` directory. See `docs/screenshots/README.md` for detailed instructions.
+
+### Main Dashboard
+![SupplySight Dashboard](docs/screenshots/dashboard-main.png)
+*Main dashboard view with KPI cards, filters, and product table*
+
+### Product Details Drawer
+![Product Drawer](docs/screenshots/product-drawer.png)
+*Product details drawer with update demand and transfer stock functionality*
+
+### Mobile Responsive View
+![Mobile View](docs/screenshots/mobile-view.png)
+*Responsive design optimized for mobile devices*
+
+### Filtered Results
+![Filtered Results](docs/screenshots/filtered-results.png)
+*Dashboard with active filters showing critical stock items*
+
 ## 📊 Dashboard Features
 
 ### KPI Cards
