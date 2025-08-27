@@ -9,7 +9,7 @@ provider "render" {
 # Backend GraphQL Service
 resource "render_web_service" "backend" {
   name   = "supplysight-backend"
-  plan   = "free"
+  plan   = "starter"
   region = "oregon"
 
   runtime_source = {
