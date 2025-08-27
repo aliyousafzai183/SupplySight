@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { fileURLToPath } from 'url';
-import { logger } from '../logger.js';
+import { logInfo } from '../logger.js';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const seedData = JSON.parse(
@@ -16,11 +16,11 @@ export type KPI = {
 
 export const kpisResolver = {
   kpis: async (_: any, { range }: { range: number }) => {
-    logger.info('Querying KPIs', { range });
+    logInfo('Querying KPIs', { range });
 
     // Calculate base totals from seed data
-    const totalStock = seedData.reduce((sum, product) => sum + product.stock, 0);
-    const totalDemand = seedData.reduce((sum, product) => sum + product.demand, 0);
+    const totalStock = seedData.reduce((sum: number, product: any) => sum + product.stock, 0);
+    const totalDemand = seedData.reduce((sum: number, product: any) => sum + product.demand, 0);
 
     // Generate trend data for the specified range
     const kpis: KPI[] = [];
@@ -42,7 +42,7 @@ export const kpisResolver = {
       });
     }
 
-    logger.info('KPIs query result', { count: kpis.length, range });
+    logInfo('KPIs query result', { count: kpis.length, range });
     return kpis;
   }
 };

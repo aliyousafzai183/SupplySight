@@ -1,24 +1,25 @@
-import { createYoga } from '@graphql-yoga/node';
+import { createYoga } from 'graphql-yoga';
+import { createSchema } from 'graphql-yoga';
+import { createServer } from 'http';
 import { typeDefs } from './schema.js';
 import { productsResolver } from './resolvers/products.js';
 import { kpisResolver } from './resolvers/kpis.js';
 import { mutationsResolver } from './resolvers/mutations.js';
-import { logger } from './logger.js';
+import { logInfo } from './logger.js';
+
+const schema = createSchema({
+  typeDefs,
+  resolvers: {
+    Query: {
+      ...productsResolver,
+      ...kpisResolver
+    },
+    Mutation: mutationsResolver
+  }
+});
 
 const yoga = createYoga({
-  schema: {
-    typeDefs,
-    resolvers: {
-      Query: {
-        ...productsResolver,
-        ...kpisResolver
-      },
-      Mutation: mutationsResolver
-    }
-  },
-  logging: {
-    level: 'info'
-  },
+  schema,
   cors: {
     origin: process.env.NODE_ENV === 'production' 
       ? ['https://supply-sight-dev.vercel.app', 'https://supply-sight-prod.vercel.app']
@@ -27,12 +28,11 @@ const yoga = createYoga({
   }
 });
 
+const server = createServer(yoga);
+
 const port = process.env.PORT || 4000;
 
-yoga.start({
-  port,
-  endpoint: '/graphql'
-}).then(() => {
-  logger.info(`🚀 GraphQL server running on http://localhost:${port}/graphql`);
-  logger.info(`📊 GraphQL Playground available at http://localhost:${port}/graphql`);
+server.listen(port, () => {
+  logInfo(`🚀 GraphQL server running on http://localhost:${port}/graphql`);
+  logInfo(`📊 GraphQL Playground available at http://localhost:${port}/graphql`);
 });

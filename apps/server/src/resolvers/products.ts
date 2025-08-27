@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { fileURLToPath } from 'url';
-import { logger } from '../logger.js';
+import { logInfo } from '../logger.js';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const seedData = JSON.parse(
@@ -42,7 +42,7 @@ export const productsResolver = {
       pageSize?: number;
     }
   ) => {
-    logger.info('Querying products', { search, warehouse, status, page, pageSize });
+    logInfo('Querying products', { search, warehouse, status, page, pageSize });
 
     let filteredProducts = [...seedData];
 
@@ -76,7 +76,7 @@ export const productsResolver = {
     const endIndex = startIndex + pageSize;
     const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
 
-    logger.info('Products query result', {
+    logInfo('Products query result', {
       total: filteredProducts.length,
       returned: paginatedProducts.length,
       page,
@@ -87,9 +87,9 @@ export const productsResolver = {
   },
 
   warehouses: async () => {
-    logger.info('Querying warehouses');
-    const warehouses = [...new Set(seedData.map((product) => product.warehouse))];
-    logger.info('Warehouses query result', { count: warehouses.length });
+    logInfo('Querying warehouses');
+    const warehouses = [...new Set(seedData.map((product: any) => product.warehouse))];
+    logInfo('Warehouses query result', { count: warehouses.length });
     return warehouses;
   }
 };

@@ -1,7 +1,9 @@
 {
   "name": "supply-sight",
   "private": true,
-  "workspaces": ["apps/*"],
+  "workspaces": [
+    "apps/*"
+  ],
   "scripts": {
     "dev": "npm run dev --workspace=apps/server & npm run dev --workspace=apps/web",
     "build": "npm run build --workspace=apps/server && npm run build --workspace=apps/web",
@@ -13,5 +15,20 @@
   "devDependencies": {
     "@types/node": "^22.0.0",
     "typescript": "^5.4.0"
-  }
+  },
+  "version": "1.0.0",
+  "description": "A production-ready Daily Inventory Dashboard built with React, TypeScript, and GraphQL. This project demonstrates modern web development practices with a focus on clean architecture, excellent developer experience, and real-world quality gates.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aliyousafzai183/SupplySight.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/aliyousafzai183/SupplySight/issues"
+  },
+  "homepage": "https://github.com/aliyousafzai183/SupplySight#readme"
 }

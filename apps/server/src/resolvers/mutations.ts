@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { fileURLToPath } from 'url';
-import { logger } from '../logger.js';
+import { logInfo } from '../logger.js';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const seedDataPath = join(__dirname, '../data/seed.json');
@@ -14,13 +14,13 @@ const saveData = () => {
 
 export const mutationsResolver = {
   updateDemand: async (_: any, { id, demand }: { id: string; demand: number }) => {
-    logger.info('Updating demand', { id, demand });
+    logInfo('Updating demand', { id, demand });
 
     if (demand < 0) {
       throw new Error('Demand cannot be negative');
     }
 
-    const productIndex = seedData.findIndex((product) => product.id === id);
+    const productIndex = seedData.findIndex((product: any) => product.id === id);
     if (productIndex === -1) {
       throw new Error('Product not found');
     }
@@ -29,7 +29,7 @@ export const mutationsResolver = {
     seedData[productIndex] = product;
     saveData();
 
-    logger.info('Demand updated successfully', { id, demand });
+    logInfo('Demand updated successfully', { id, demand });
     return product;
   },
 
@@ -37,13 +37,13 @@ export const mutationsResolver = {
     _: any,
     { id, qty, from, to }: { id: string; qty: number; from: string; to: string }
   ) => {
-    logger.info('Transferring stock', { id, qty, from, to });
+    logInfo('Transferring stock', { id, qty, from, to });
 
     if (qty <= 0) {
       throw new Error('Transfer quantity must be positive');
     }
 
-    const productIndex = seedData.findIndex((product) => product.id === id);
+    const productIndex = seedData.findIndex((product: any) => product.id === id);
     if (productIndex === -1) {
       throw new Error('Product not found');
     }
@@ -63,7 +63,7 @@ export const mutationsResolver = {
     seedData[productIndex] = updatedProduct;
     saveData();
 
-    logger.info('Stock transferred successfully', { id, qty, from, to });
+    logInfo('Stock transferred successfully', { id, qty, from, to });
     return updatedProduct;
   }
 };

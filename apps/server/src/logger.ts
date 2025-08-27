@@ -11,3 +11,12 @@ export const logger = pino({
     }
   }
 });
+
+// Helper function for structured logging
+export const logInfo = (message: string, data?: Record<string, any>) => {
+  if (data) {
+    logger.info({ ...data }, message);
+  } else {
+    logger.info(message);
+  }
+};
