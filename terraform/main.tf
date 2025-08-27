@@ -1,12 +1,4 @@
-terraform {
-  required_providers {
-    render = {
-      source  = "render-oss/render"
-      version = "~> 1.0"
-    }
-  }
-  required_version = ">= 1.0"
-}
+# Terraform configuration is in versions.tf
 
 # Configure the Render Provider
 provider "render" {

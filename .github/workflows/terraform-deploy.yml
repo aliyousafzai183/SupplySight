@@ -9,14 +9,6 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - '.github/workflows/terraform-deploy.yml'
-  pull_request:
-    branches: [ main ]
-    paths:
-      - 'terraform/**'
-      - 'apps/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - '.github/workflows/terraform-deploy.yml'
 
 jobs:
   terraform:
