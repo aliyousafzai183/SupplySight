@@ -3,8 +3,11 @@ name: Lint
 on:
   pull_request:
     branches: [ main ]
-  push:
-    branches: [ main ]
+    paths:
+      - 'apps/web/**/*.{js,jsx,ts,tsx}'
+      - 'apps/web/.eslintrc.*'
+      - 'apps/web/eslint.config.*'
+      - '.github/workflows/lint.yml'
 
 jobs:
   lint:

@@ -3,8 +3,16 @@ name: Build
 on:
   pull_request:
     branches: [ main ]
-  push:
-    branches: [ main ]
+    paths:
+      - 'apps/web/**/*.{js,jsx,ts,tsx}'
+      - 'apps/web/**/*.{css,scss}'
+      - 'apps/web/vite.config.*'
+      - 'apps/web/tailwind.config.*'
+      - 'apps/web/package.json'
+      - 'apps/server/**/*.{js,ts}'
+      - 'apps/server/package.json'
+      - 'package.json'
+      - '.github/workflows/build.yml'
 
 jobs:
   build:
