@@ -30,6 +30,10 @@ A production-ready Daily Inventory Dashboard built with React, TypeScript, and G
 ![Filtered Results](docs/screenshots/filtered-results.png)
 *Dashboard with active filters showing critical stock items*
 
+### GitHub PR Checks
+![Required Checks](docs/screenshots/required-checks.png)
+*GitHub Actions CI/CD checks that must pass before merging to main branch*
+
 ## 📊 Dashboard Features
 
 ### KPI Cards
@@ -228,6 +232,8 @@ Each product includes realistic stock and demand values to demonstrate the statu
 - **`test.yml`** - Unit test execution
 - **`build.yml`** - Production build verification
 - **`delete-branch.yml`** - Automatic branch cleanup after merge
+
+**All checks must pass before merging to main branch** - See screenshot above for the required checks interface.
 
 ### Vercel Deployment
 The application is designed for deployment on Vercel with:
