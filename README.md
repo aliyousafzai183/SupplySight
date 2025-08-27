@@ -231,9 +231,19 @@ Each product includes realistic stock and demand values to demonstrate the statu
 - **`typecheck.yml`** - TypeScript compilation verification
 - **`test.yml`** - Unit test execution
 - **`build.yml`** - Production build verification
+- **`terraform-deploy.yml`** - Infrastructure deployment to Render
 - **`delete-branch.yml`** - Automatic branch cleanup after merge
 
 **All checks must pass before merging to main branch** - See screenshot above for the required checks interface.
+
+### Infrastructure as Code
+The project uses **Terraform** for infrastructure management:
+- **Infrastructure as Code** - Version-controlled infrastructure
+- **Automated Deployment** - GitHub Actions deploys on push to main
+- **Environment Management** - Easy to manage multiple environments
+- **Cost Optimization** - Free tier deployment on Render
+
+See `terraform/README.md` for detailed deployment instructions.
 
 ### Vercel Deployment
 The application is designed for deployment on Vercel with:
