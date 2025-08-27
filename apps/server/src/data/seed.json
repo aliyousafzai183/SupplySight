@@ -19,9 +19,9 @@
     "id": "P-1003",
     "name": "M8 Nut",
     "sku": "NUT-08-200",
-    "warehouse": "PNQ-C",
-    "stock": 80,
-    "demand": 82
+    "warehouse": "BLR-A",
+    "stock": 79,
+    "demand": 999
   },
   {
     "id": "P-1004",

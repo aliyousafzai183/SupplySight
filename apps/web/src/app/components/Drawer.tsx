@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { UPDATE_DEMAND, TRANSFER_STOCK } from '../features/products/mutations.js';
+import { GET_WAREHOUSES } from '../features/products/queries.js';
 import type { Product } from '../features/products/types.js';
 import { StatusPill } from './StatusPill.js';
 import { getStatus } from '../lib/status.js';
@@ -16,16 +17,22 @@ export function Drawer({ product, onClose, onUpdate }: DrawerProps) {
   const [transferAmount, setTransferAmount] = useState('');
   const [targetWarehouse, setTargetWarehouse] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   const [updateDemand] = useMutation(UPDATE_DEMAND);
   const [transferStock] = useMutation(TRANSFER_STOCK);
+  const { data: warehousesData } = useQuery(GET_WAREHOUSES);
 
   const status = getStatus(product.stock, product.demand);
+  
+  // Get available warehouses excluding current warehouse
+  const availableWarehouses = warehousesData?.warehouses?.filter((w: string) => w !== product.warehouse) || [];
 
   const handleUpdateDemand = async () => {
     if (!demand || isNaN(Number(demand))) return;
     
     setIsUpdating(true);
+    setMessage(null);
     try {
       await updateDemand({
         variables: {
@@ -40,9 +47,11 @@ export function Drawer({ product, onClose, onUpdate }: DrawerProps) {
           }
         }
       });
+      setMessage({ type: 'success', text: 'Demand updated successfully!' });
       onUpdate?.();
     } catch (error) {
       console.error('Failed to update demand:', error);
+      setMessage({ type: 'error', text: 'Failed to update demand. Please try again.' });
     } finally {
       setIsUpdating(false);
     }
@@ -51,12 +60,19 @@ export function Drawer({ product, onClose, onUpdate }: DrawerProps) {
   const handleTransferStock = async () => {
     if (!transferAmount || !targetWarehouse || isNaN(Number(transferAmount))) return;
     
+    const amount = parseInt(transferAmount);
+    if (amount > product.stock) {
+      setMessage({ type: 'error', text: `Cannot transfer more than available stock (${product.stock})` });
+      return;
+    }
+    
     setIsUpdating(true);
+    setMessage(null);
     try {
       await transferStock({
         variables: {
           id: product.id,
-          qty: parseInt(transferAmount),
+          qty: amount,
           from: product.warehouse,
           to: targetWarehouse
         },
@@ -65,13 +81,17 @@ export function Drawer({ product, onClose, onUpdate }: DrawerProps) {
             __typename: 'Product',
             ...product,
             warehouse: targetWarehouse,
-            stock: product.stock - parseInt(transferAmount)
+            stock: product.stock - amount
           }
         }
       });
+      setMessage({ type: 'success', text: `Successfully transferred ${amount} units to ${targetWarehouse}!` });
+      setTransferAmount('');
+      setTargetWarehouse('');
       onUpdate?.();
     } catch (error) {
       console.error('Failed to transfer stock:', error);
+      setMessage({ type: 'error', text: 'Failed to transfer stock. Please try again.' });
     } finally {
       setIsUpdating(false);
     }
@@ -103,6 +123,22 @@ export function Drawer({ product, onClose, onUpdate }: DrawerProps) {
 
           {/* Content */}
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
+            {/* Message Display */}
+            {message && (
+              <div className={`rounded-lg p-4 ${
+                message.type === 'success' 
+                  ? 'bg-green-50 border border-green-200 text-green-800' 
+                  : 'bg-red-50 border border-red-200 text-red-800'
+              }`}>
+                <div className="flex items-center">
+                  <span className="mr-2">
+                    {message.type === 'success' ? '✅' : '❌'}
+                  </span>
+                  <span className="text-sm font-medium">{message.text}</span>
+                </div>
+              </div>
+            )}
+
             {/* Product Info */}
             <div className="glass-card rounded-xl p-4">
               <h3 className="text-lg font-semibold text-gray-800 mb-3">{product.name}</h3>
@@ -138,14 +174,19 @@ export function Drawer({ product, onClose, onUpdate }: DrawerProps) {
             <div className="glass-card rounded-xl p-4">
               <h4 className="text-md font-semibold text-gray-800 mb-3">Update Demand</h4>
               <div className="space-y-3">
-                <input
-                  type="number"
-                  value={demand}
-                  onChange={(e) => setDemand(e.target.value)}
-                  placeholder="New demand value"
-                  className="input-field w-full"
-                  min="0"
-                />
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    New demand value (current: {product.demand})
+                  </label>
+                  <input
+                    type="number"
+                    value={demand}
+                    onChange={(e) => setDemand(e.target.value)}
+                    placeholder="Enter new demand"
+                    className="input-field w-full"
+                    min="0"
+                  />
+                </div>
                 <button
                   onClick={handleUpdateDemand}
                   disabled={isUpdating || !demand || isNaN(Number(demand))}
@@ -160,25 +201,46 @@ export function Drawer({ product, onClose, onUpdate }: DrawerProps) {
             <div className="glass-card rounded-xl p-4">
               <h4 className="text-md font-semibold text-gray-800 mb-3">Transfer Stock</h4>
               <div className="space-y-3">
-                <input
-                  type="number"
-                  value={transferAmount}
-                  onChange={(e) => setTransferAmount(e.target.value)}
-                  placeholder="Amount to transfer"
-                  className="input-field w-full"
-                  min="1"
-                  max={product.stock}
-                />
-                <input
-                  type="text"
-                  value={targetWarehouse}
-                  onChange={(e) => setTargetWarehouse(e.target.value)}
-                  placeholder="Target warehouse"
-                  className="input-field w-full"
-                />
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Amount to transfer (max: {product.stock})
+                  </label>
+                  <input
+                    type="number"
+                    value={transferAmount}
+                    onChange={(e) => setTransferAmount(e.target.value)}
+                    placeholder="Enter amount"
+                    className="input-field w-full"
+                    min="1"
+                    max={product.stock}
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Target warehouse
+                  </label>
+                  <select
+                    value={targetWarehouse}
+                    onChange={(e) => setTargetWarehouse(e.target.value)}
+                    className="input-field w-full"
+                    disabled={availableWarehouses.length === 0}
+                  >
+                    <option value="">Select target warehouse</option>
+                    {availableWarehouses.map((warehouse: string) => (
+                      <option key={warehouse} value={warehouse}>
+                        {warehouse}
+                      </option>
+                    ))}
+                  </select>
+                  {availableWarehouses.length === 0 && (
+                    <p className="text-xs text-gray-500 mt-1">No other warehouses available</p>
+                  )}
+                </div>
+                
                 <button
                   onClick={handleTransferStock}
-                  disabled={isUpdating || !transferAmount || !targetWarehouse || isNaN(Number(transferAmount))}
+                  disabled={isUpdating || !transferAmount || !targetWarehouse || isNaN(Number(transferAmount)) || parseInt(transferAmount) > product.stock}
                   className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isUpdating ? 'Transferring...' : 'Transfer Stock'}
