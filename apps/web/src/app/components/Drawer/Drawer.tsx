@@ -16,23 +16,25 @@ interface DrawerProps {
 }
 
 export function Drawer({ product, onClose, onUpdate }: DrawerProps) {
-  // Handle null product case
-  if (!product) {
-    return null;
-  }
-
-  const [demand, setDemand] = useState(product.demand.toString());
+  const [demand, setDemand] = useState(product?.demand?.toString() || "");
   const [transferAmount, setTransferAmount] = useState("");
   const [targetWarehouse, setTargetWarehouse] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
-    setDemand(product.demand.toString());
-  }, [product.demand]);
+    if (product?.demand) {
+      setDemand(product.demand.toString());
+    }
+  }, [product?.demand]);
 
   const [updateDemand] = useMutation(UPDATE_DEMAND);
   const [transferStock] = useMutation(TRANSFER_STOCK);
   const { data: warehousesData } = useQuery(GET_WAREHOUSES);
+
+  // Handle null product case
+  if (!product) {
+    return null;
+  }
 
   const status = getStatus(product.stock, product.demand);
 

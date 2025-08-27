@@ -18,22 +18,28 @@ Object.defineProperty(window, 'matchMedia', {
 });
 
 // Mock IntersectionObserver
-global.IntersectionObserver = vi.fn().mockImplementation(() => ({
-  observe: vi.fn(),
-  unobserve: vi.fn(),
-  disconnect: vi.fn(),
-}));
+Object.defineProperty(window, 'IntersectionObserver', {
+  writable: true,
+  value: vi.fn().mockImplementation(() => ({
+    observe: vi.fn(),
+    unobserve: vi.fn(),
+    disconnect: vi.fn(),
+  })),
+});
 
 // Mock ResizeObserver
-global.ResizeObserver = vi.fn().mockImplementation(() => ({
-  observe: vi.fn(),
-  unobserve: vi.fn(),
-  disconnect: vi.fn(),
-}));
+Object.defineProperty(window, 'ResizeObserver', {
+  writable: true,
+  value: vi.fn().mockImplementation(() => ({
+    observe: vi.fn(),
+    unobserve: vi.fn(),
+    disconnect: vi.fn(),
+  })),
+});
 
 // Mock recharts
 vi.mock('recharts', () => {
-  const LineChartComponent = ({ children, data, ...props }: any) => {
+  const LineChartComponent = ({ children, data, ...props }: { children?: React.ReactNode; data?: unknown; [key: string]: unknown }) => {
     return React.createElement('div', { 
       'data-testid': 'line-chart', 
       'data-chart-data': JSON.stringify(data), 
@@ -43,7 +49,7 @@ vi.mock('recharts', () => {
 
   return {
     LineChart: LineChartComponent,
-    Line: ({ dataKey, stroke, strokeWidth, ...props }: any) => {
+    Line: ({ dataKey, stroke, strokeWidth, ...props }: { dataKey?: string; stroke?: string; strokeWidth?: number; [key: string]: unknown }) => {
       return React.createElement('div', { 
         'data-testid': `line-${dataKey}`, 
         'data-stroke': stroke, 
@@ -51,43 +57,43 @@ vi.mock('recharts', () => {
         ...props 
       });
     },
-    XAxis: ({ dataKey, ...props }: any) => {
+    XAxis: ({ dataKey, ...props }: { dataKey?: string; [key: string]: unknown }) => {
       return React.createElement('div', { 'data-testid': `xaxis-${dataKey}`, ...props });
     },
-    YAxis: ({ ...props }: any) => {
+    YAxis: ({ ...props }: { [key: string]: unknown }) => {
       return React.createElement('div', { 'data-testid': 'yaxis', ...props });
     },
-    CartesianGrid: ({ strokeDasharray, ...props }: any) => {
+    CartesianGrid: ({ strokeDasharray, ...props }: { strokeDasharray?: string; [key: string]: unknown }) => {
       return React.createElement('div', { 'data-testid': 'cartesian-grid', 'data-stroke-dasharray': strokeDasharray, ...props });
     },
-    Tooltip: ({ content, ...props }: any) => {
-      return React.createElement('div', { 'data-testid': 'tooltip', ...props }, content && content({}));
+    Tooltip: ({ content, ...props }: { content?: () => React.ReactNode; [key: string]: unknown }) => {
+      return React.createElement('div', { 'data-testid': 'tooltip', ...props }, content && content());
     },
-    Legend: ({ ...props }: any) => {
+    Legend: ({ ...props }: { [key: string]: unknown }) => {
       return React.createElement('div', { 'data-testid': 'legend', ...props });
     },
-    ResponsiveContainer: ({ children, ...props }: any) => {
+    ResponsiveContainer: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => {
       return React.createElement('div', { 'data-testid': 'responsive-container', ...props }, children);
     },
-    Area: ({ dataKey, ...props }: any) => {
+    Area: ({ dataKey, ...props }: { dataKey?: string; [key: string]: unknown }) => {
       return React.createElement('div', { 'data-testid': `area-${dataKey}`, ...props });
     },
-    AreaChart: ({ children, data, ...props }: any) => {
+    AreaChart: ({ children, data, ...props }: { children?: React.ReactNode; data?: unknown; [key: string]: unknown }) => {
       return React.createElement('div', { 'data-testid': 'area-chart', 'data-chart-data': JSON.stringify(data), ...props }, children);
     },
-    Bar: ({ dataKey, ...props }: any) => {
+    Bar: ({ dataKey, ...props }: { dataKey?: string; [key: string]: unknown }) => {
       return React.createElement('div', { 'data-testid': `bar-${dataKey}`, ...props });
     },
-    BarChart: ({ children, data, ...props }: any) => {
+    BarChart: ({ children, data, ...props }: { children?: React.ReactNode; data?: unknown; [key: string]: unknown }) => {
       return React.createElement('div', { 'data-testid': 'bar-chart', 'data-chart-data': JSON.stringify(data), ...props }, children);
     },
-    PieChart: ({ children, data, ...props }: any) => {
+    PieChart: ({ children, data, ...props }: { children?: React.ReactNode; data?: unknown; [key: string]: unknown }) => {
       return React.createElement('div', { 'data-testid': 'pie-chart', 'data-chart-data': JSON.stringify(data), ...props }, children);
     },
-    Pie: ({ dataKey, ...props }: any) => {
+    Pie: ({ dataKey, ...props }: { dataKey?: string; [key: string]: unknown }) => {
       return React.createElement('div', { 'data-testid': `pie-${dataKey}`, ...props });
     },
-    Cell: ({ ...props }: any) => {
+    Cell: ({ ...props }: { [key: string]: unknown }) => {
       return React.createElement('div', { 'data-testid': 'cell', ...props });
     },
   };

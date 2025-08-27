@@ -1,1 +1,1 @@
-export * from './index';
+export { Dashboard } from './index.tsx';

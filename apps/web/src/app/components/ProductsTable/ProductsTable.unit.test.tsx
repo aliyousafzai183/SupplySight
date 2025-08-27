@@ -5,7 +5,7 @@ import type { Product } from '../../features/products/types';
 
 // Mock the Drawer component
 vi.mock('./Drawer', () => ({
-  Drawer: ({ isOpen, onClose, product }: any) => 
+  Drawer: ({ isOpen, onClose, product }: { isOpen?: boolean; onClose?: () => void; product?: Product }) => 
     isOpen ? (
       <div data-testid="drawer" data-product-id={product?.id}>
         <button onClick={onClose}>Close</button>
@@ -251,7 +251,7 @@ describe('ProductsTable', () => {
     it('should handle products with missing data', () => {
       const incompleteProducts = [
         { ...mockProducts[0], name: undefined, sku: undefined },
-      ] as any;
+      ] as unknown as Product[];
       
       render(<ProductsTable {...defaultProps} data={{ ...defaultProps.data, products: incompleteProducts }} />);
       

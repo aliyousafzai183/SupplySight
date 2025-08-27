@@ -1,4 +1,4 @@
-import { Dashboard } from './app/routes/index.js';
+import { Dashboard } from './app/routes/index/index';
 
 function App() {
   return (

@@ -417,7 +417,7 @@ describe('Drawer', () => {
     it('should handle null product', () => {
       render(
         <MockedProvider mocks={mocks} addTypename={false}>
-          <Drawer {...defaultProps} product={null as any} />
+          <Drawer {...defaultProps} product={null as unknown as Product} />
         </MockedProvider>
       );
 
@@ -433,7 +433,7 @@ describe('Drawer', () => {
         warehouse: 'BLR-A',
         stock: 100,
         demand: 80,
-      } as any;
+      } as unknown as Product;
 
       render(
         <MockedProvider mocks={mocks} addTypename={false}>
